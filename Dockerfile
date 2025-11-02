@@ -24,8 +24,8 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o scad-server .
 # Final stage
 FROM openscad/openscad:trixie
 
-# Install ca-certificates for HTTPS
-RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && \
+# Install ca-certificates and wget for health checks
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates wget && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
