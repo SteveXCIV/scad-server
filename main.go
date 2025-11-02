@@ -1,8 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"net"
 	"os"
+	"os/exec"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/stevexciv/scad-server/docs"
@@ -24,6 +27,11 @@ import (
 //
 // @BasePath /
 func main() {
+	// Check if OpenSCAD is available
+	if err := checkOpenSCAD(); err != nil {
+		log.Fatalf("OpenSCAD not available: %v", err)
+	}
+
 	// Set Gin mode from environment variable
 	mode := os.Getenv("GIN_MODE")
 	if mode == "" {
@@ -52,11 +60,36 @@ func main() {
 	// Get port from environment variable
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080"
+		port = "8000"
+	}
+
+	// Check if port is available
+	addr := ":" + port
+	if err := checkPortAvailable(addr); err != nil {
+		log.Fatalf("Port %s is not available: %v", port, err)
 	}
 
 	log.Printf("Starting server on port %s", port)
-	if err := router.Run(":" + port); err != nil {
+	if err := router.Run(addr); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
+}
+
+// checkOpenSCAD verifies that the openscad binary is available
+func checkOpenSCAD() error {
+	cmd := exec.Command("openscad", "--version")
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("openscad binary not found or not executable: %w", err)
+	}
+	return nil
+}
+
+// checkPortAvailable checks if the specified port is available for binding
+func checkPortAvailable(addr string) error {
+	listener, err := net.Listen("tcp", addr)
+	if err != nil {
+		return err
+	}
+	listener.Close()
+	return nil
 }

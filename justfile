@@ -44,7 +44,7 @@ docker-build:
 
 # Run Docker container
 docker-run:
-    docker run -p 8080:8080 scad-server:latest
+    docker run -p 8000:8000 scad-server:latest
 
 # Run linter
 lint:

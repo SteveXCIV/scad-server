@@ -17,7 +17,7 @@ Hopefully others will find this useful as well.
 
 ### Base URL
 ```
-http://localhost:8080/openscad/v1
+http://localhost:8000/openscad/v1
 ```
 
 ### Endpoints
@@ -91,7 +91,7 @@ swag init
 just run
 ```
 
-The server will start on `http://localhost:8080`.
+The server will start on `http://localhost:8000`.
 
 ### Docker Deployment
 
@@ -110,7 +110,7 @@ just docker-run
 For AMD64 platform specifically:
 ```bash
 docker build --platform linux/amd64 -t scad-server:latest .
-docker run --platform linux/amd64 -p 8080:8080 scad-server:latest
+docker run --platform linux/amd64 -p 8000:8000 scad-server:latest
 ```
 
 ## Usage Examples
@@ -118,7 +118,7 @@ docker run --platform linux/amd64 -p 8080:8080 scad-server:latest
 ### Export to PNG
 
 ```bash
-curl -X POST http://localhost:8080/openscad/v1/export \
+curl -X POST http://localhost:8000/openscad/v1/export \
   -H "Content-Type: application/json" \
   -d '{
     "scad_content": "cube([10,10,10]);",
@@ -136,7 +136,7 @@ curl -X POST http://localhost:8080/openscad/v1/export \
 ### Export to STL (Binary)
 
 ```bash
-curl -X POST http://localhost:8080/openscad/v1/export \
+curl -X POST http://localhost:8000/openscad/v1/export \
   -H "Content-Type: application/json" \
   -d '{
     "scad_content": "sphere(r=5);",
@@ -153,7 +153,7 @@ curl -X POST http://localhost:8080/openscad/v1/export \
 ### Export to SVG
 
 ```bash
-curl -X POST http://localhost:8080/openscad/v1/export \
+curl -X POST http://localhost:8000/openscad/v1/export \
   -H "Content-Type: application/json" \
   -d '{
     "scad_content": "circle(r=10);",
@@ -174,7 +174,7 @@ curl -X POST http://localhost:8080/openscad/v1/export \
 ### Export to PDF
 
 ```bash
-curl -X POST http://localhost:8080/openscad/v1/export \
+curl -X POST http://localhost:8000/openscad/v1/export \
   -H "Content-Type: application/json" \
   -d '{
     "scad_content": "square([20,20]);",
@@ -194,7 +194,7 @@ curl -X POST http://localhost:8080/openscad/v1/export \
 ### Generate Summary
 
 ```bash
-curl -X POST http://localhost:8080/openscad/v1/summary \
+curl -X POST http://localhost:8000/openscad/v1/summary \
   -H "Content-Type: application/json" \
   -d '{
     "scad_content": "cube([10,10,10]);",
@@ -207,14 +207,14 @@ curl -X POST http://localhost:8080/openscad/v1/summary \
 Once the server is running, you can access the interactive Swagger documentation at:
 
 ```
-http://localhost:8080/swagger/index.html
+http://localhost:8000/swagger/index.html
 ```
 
 ## Configuration
 
 The server can be configured using environment variables:
 
-- `PORT` - Server port (default: 8080)
+- `PORT` - Server port (default: 8000)
 - `GIN_MODE` - Gin framework mode: `debug`, `release`, or `test` (default: release)
 
 Example:

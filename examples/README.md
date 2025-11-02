@@ -6,7 +6,7 @@ This directory contains example JSON payloads for testing the API.
 
 ### Export to PNG
 ```bash
-curl -X POST http://localhost:8080/openscad/v1/export \
+curl -X POST http://localhost:8000/openscad/v1/export \
   -H "Content-Type: application/json" \
   -d @examples/export-png.json \
   --output cube.png
@@ -14,7 +14,7 @@ curl -X POST http://localhost:8080/openscad/v1/export \
 
 ### Export to STL
 ```bash
-curl -X POST http://localhost:8080/openscad/v1/export \
+curl -X POST http://localhost:8000/openscad/v1/export \
   -H "Content-Type: application/json" \
   -d @examples/export-stl.json \
   --output sphere.stl
@@ -22,7 +22,7 @@ curl -X POST http://localhost:8080/openscad/v1/export \
 
 ### Export to SVG
 ```bash
-curl -X POST http://localhost:8080/openscad/v1/export \
+curl -X POST http://localhost:8000/openscad/v1/export \
   -H "Content-Type: application/json" \
   -d @examples/export-svg.json \
   --output circle.svg
@@ -30,7 +30,7 @@ curl -X POST http://localhost:8080/openscad/v1/export \
 
 ### Export to PDF
 ```bash
-curl -X POST http://localhost:8080/openscad/v1/export \
+curl -X POST http://localhost:8000/openscad/v1/export \
   -H "Content-Type: application/json" \
   -d @examples/export-pdf.json \
   --output square.pdf
@@ -38,7 +38,7 @@ curl -X POST http://localhost:8080/openscad/v1/export \
 
 ### Generate Summary
 ```bash
-curl -X POST http://localhost:8080/openscad/v1/summary \
+curl -X POST http://localhost:8000/openscad/v1/summary \
   -H "Content-Type: application/json" \
   -d @examples/summary.json
 ```
@@ -63,7 +63,7 @@ Create a more complex SCAD model:
 Save this to a file (e.g., `complex.json`) and run:
 
 ```bash
-curl -X POST http://localhost:8080/openscad/v1/export \
+curl -X POST http://localhost:8000/openscad/v1/export \
   -H "Content-Type: application/json" \
   -d @complex.json \
   --output complex.png

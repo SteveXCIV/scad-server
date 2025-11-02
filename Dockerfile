@@ -39,11 +39,11 @@ WORKDIR /app
 COPY --from=builder /app/scad-server .
 
 # Expose port
-EXPOSE 8080
+EXPOSE 8000
 
 # Set environment variables
 ENV GIN_MODE=release
-ENV PORT=8080
+ENV PORT=8000
 
 # Run the application
 CMD ["./scad-server"]

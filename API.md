@@ -7,7 +7,7 @@ The OpenSCAD HTTP API provides RESTful endpoints for converting OpenSCAD content
 ## Base URL
 
 ```
-http://localhost:8080
+http://localhost:8000
 ```
 
 ## Authentication
@@ -191,7 +191,7 @@ Generate summary information for OpenSCAD content.
 ### Export a Cube to PNG
 
 ```bash
-curl -X POST http://localhost:8080/openscad/v1/export \
+curl -X POST http://localhost:8000/openscad/v1/export \
   -H "Content-Type: application/json" \
   -d '{
     "scad_content": "cube([10,10,10]);",
@@ -209,7 +209,7 @@ curl -X POST http://localhost:8080/openscad/v1/export \
 ### Export a Sphere to Binary STL
 
 ```bash
-curl -X POST http://localhost:8080/openscad/v1/export \
+curl -X POST http://localhost:8000/openscad/v1/export \
   -H "Content-Type: application/json" \
   -d '{
     "scad_content": "sphere(r=5);",
@@ -221,7 +221,7 @@ curl -X POST http://localhost:8080/openscad/v1/export \
 ### Export a Circle to SVG with Custom Colors
 
 ```bash
-curl -X POST http://localhost:8080/openscad/v1/export \
+curl -X POST http://localhost:8000/openscad/v1/export \
   -H "Content-Type: application/json" \
   -d '{
     "scad_content": "circle(r=10);",
@@ -242,7 +242,7 @@ curl -X POST http://localhost:8080/openscad/v1/export \
 ### Export to PDF with Grid
 
 ```bash
-curl -X POST http://localhost:8080/openscad/v1/export \
+curl -X POST http://localhost:8000/openscad/v1/export \
   -H "Content-Type: application/json" \
   -d '{
     "scad_content": "square([20,20]);",
@@ -262,7 +262,7 @@ curl -X POST http://localhost:8080/openscad/v1/export \
 ### Generate Complete Summary
 
 ```bash
-curl -X POST http://localhost:8080/openscad/v1/summary \
+curl -X POST http://localhost:8000/openscad/v1/summary \
   -H "Content-Type: application/json" \
   -d '{
     "scad_content": "difference() { cube([20,20,20], center=true); sphere(r=12); }",
@@ -273,7 +273,7 @@ curl -X POST http://localhost:8080/openscad/v1/summary \
 ### Generate Geometry Summary Only
 
 ```bash
-curl -X POST http://localhost:8080/openscad/v1/summary \
+curl -X POST http://localhost:8000/openscad/v1/summary \
   -H "Content-Type: application/json" \
   -d '{
     "scad_content": "cube([10,10,10]);",
@@ -335,7 +335,7 @@ Currently, no rate limiting is implemented. Consider adding rate limiting in pro
 Interactive API documentation is available at:
 
 ```
-http://localhost:8080/swagger/index.html
+http://localhost:8000/swagger/index.html
 ```
 
 This provides a complete, interactive interface to explore and test all API endpoints.
