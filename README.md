@@ -1,15 +1,17 @@
 # OpenSCAD HTTP API Server
 
-A RESTful HTTP API that provides headless access to core OpenSCAD functionality, specifically file export and summary generation capabilities. The API accepts SCAD file content via JSON payloads and returns processed results.
+An HTTP API that provides access to core OpenSCAD functionality, specifically file export and summarization. The API accepts SCAD file content via JSON payloads and returns processed results.
+
+I decided to build this because I wanted more-or-less a "CI" server for generating OpenSCAD models on my home server.
+Hopefully others will find this useful as well.
 
 ## Features
 
-- **Export to Multiple Formats**: PNG, STL (binary/ASCII), SVG, and PDF
-- **Summary Generation**: Get detailed information about SCAD models
-- **Format-Specific Options**: Customize output with format-specific parameters
-- **OpenAPI/Swagger Documentation**: Interactive API documentation
-- **Docker Support**: Easy deployment with Docker
-- **Comprehensive Tests**: Full test coverage for all components
+- **Export to Multiple Formats**: PNG, STL (binary + ASCII), SVG, and PDF
+- **Summary Generation**: Get diagnostics about SCAD models
+- **Format-Specific Options**: Supports a subset of format-specific parameters from the OpenSCAD CLI
+- **OpenAPI Documentation**: Interactive API docs
+- **Docker/OCI Support**: Fits into existing homelabs already using k8s/compose/etc 
 
 ## API Endpoints
 
@@ -60,10 +62,10 @@ Returns the health status of the API.
 ## Installation
 
 ### Prerequisites
-- Go 1.21 or later
-- OpenSCAD (for local development)
+- Go 1.23 or later
+- OpenSCAD on your PATH (for local development)
 - Docker (for containerized deployment)
-- just (task runner) - https://github.com/casey/just
+- just (task runner):  https://github.com/casey/just (optional but **very** helpful)
 
 ### Local Development
 
@@ -93,7 +95,7 @@ The server will start on `http://localhost:8080`.
 
 ### Docker Deployment
 
-**Note:** The OpenSCAD Docker images are currently only available for AMD64 architecture. The latest available image uses Debian Buster which has been archived. For ARM64 systems (Apple Silicon), you may need to build with platform emulation or run on AMD64 hardware.
+**Note:** The latest stable OpenSCAD Docker images are only available for AMD64 architecture (Debian Bookworm at time of writing). The `latest` tag at time of writing uses Debian Buster which has been archived. For ARM64 systems, you may need to build with platform emulation. I was able to build this on an M1 Mac, but YMMV.
 
 1. Build the Docker image:
 ```bash
@@ -271,10 +273,9 @@ Common commands:
 
 ## Security Considerations
 
-- Input validation for SCAD content to prevent code injection
+- Input validation for SCAD content
 - Request size limits to prevent resource exhaustion
 - Timeout mechanisms for long-running renders (default: 5 minutes)
-- No external network access from SCAD content
 
 ## Performance
 
@@ -295,3 +296,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 For issues and questions, please open an issue on the GitHub repository:
 https://github.com/stevexciv/scad-server/issues
+
