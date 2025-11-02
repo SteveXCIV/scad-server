@@ -7,7 +7,7 @@ Hopefully others will find this useful as well.
 
 ## Features
 
-- **Export to Multiple Formats**: PNG, STL (binary + ASCII), SVG, and PDF
+- **Export to Multiple Formats**: PNG, STL (binary + ASCII), SVG, PDF, and 3MF
 - **Summary Generation**: Get diagnostics about SCAD models
 - **Format-Specific Options**: Supports a subset of format-specific parameters from the OpenSCAD CLI
 - **OpenAPI Documentation**: Interactive API docs
@@ -27,14 +27,15 @@ http://localhost:8000/openscad/v1
 POST /openscad/v1/export
 ```
 
-Exports OpenSCAD content to PNG, STL (binary/ASCII), SVG, or PDF format.
+Exports OpenSCAD content to PNG, STL (binary/ASCII), SVG, PDF, or 3MF format.
 
 **Supported Formats:**
 - `png` - Image export for visualization
-- `stl_binary` - Binary STL for 3D printing
-- `stl_ascii` - ASCII STL for 3D printing
+- `stl_binary` - Binary STL (useful for older slicer software)
+- `stl_ascii` - ASCII STL (useful for older slicer softwate)
 - `svg` - Vector graphics
 - `pdf` - Document export
+- `3mf` - 3D Manufacturing Format (good option for more modern slicers)
 
 #### 2. Generate Summary Information
 ```

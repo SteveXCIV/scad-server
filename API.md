@@ -47,7 +47,7 @@ Export OpenSCAD content to various formats.
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | scad_content | string | Yes | The OpenSCAD code to export |
-| format | string | Yes | Output format: `png`, `stl_binary`, `stl_ascii`, `svg`, `pdf` |
+| format | string | Yes | Output format: `png`, `stl_binary`, `stl_ascii`, `svg`, `pdf`, `3mf` |
 | options | object | No | Format-specific options (see below) |
 
 #### Format-Specific Options
@@ -88,6 +88,21 @@ Export OpenSCAD content to various formats.
 | stroke | boolean | No | true | - | Draw strokes |
 | stroke_color | string | No | "black" | - | Stroke color |
 | stroke_width | float | No | 0.35 | - | Stroke width |
+
+##### 3MF Options (`options.3mf`)
+
+| Field | Type | Required | Default | Valid Values | Description |
+|-------|------|----------|---------|--------------|-------------|
+| unit | string | No | "millimeter" | micron, millimeter, centimeter, meter, inch, foot | Unit of measurement |
+| decimal_precision | integer | No | 6 | 1-16 | Decimal precision for coordinates |
+| color | string | No | "#f9d72c" | - | Color in hex format |
+| color_mode | string | No | "model" | model, none, selected-only | Color mode |
+| material_type | string | No | "color" | color, basematerial | Material type |
+| add_metadata | boolean | No | true | - | Include metadata in file |
+| metadata_title | string | No | "" | - | Model title metadata |
+| metadata_designer | string | No | "" | - | Designer metadata |
+| metadata_description | string | No | "" | - | Description metadata |
+| metadata_copyright | string | No | "" | - | Copyright metadata |
 
 **Example Request - PNG:**
 ```json
@@ -259,6 +274,29 @@ curl -X POST http://localhost:8000/openscad/v1/export \
   --output square.pdf
 ```
 
+### Export to 3MF with Metadata
+
+```bash
+curl -X POST http://localhost:8000/openscad/v1/export \
+  -H "Content-Type: application/json" \
+  -d '{
+    "scad_content": "cube([10,10,10]);",
+    "format": "3mf",
+    "options": {
+      "3mf": {
+        "unit": "centimeter",
+        "decimal_precision": 6,
+        "color": "#ff0000",
+        "add_metadata": true,
+        "metadata_title": "Red Cube",
+        "metadata_designer": "OpenSCAD",
+        "metadata_description": "A simple red cube model"
+      }
+    }
+  }' \
+  --output cube.3mf
+```
+
 ### Generate Complete Summary
 
 ```bash
@@ -327,6 +365,7 @@ Currently, no rate limiting is implemented. Consider adding rate limiting in pro
 | stl_ascii | `application/octet-stream` |
 | svg | `image/svg+xml` |
 | pdf | `application/pdf` |
+| 3mf | `application/vnd.ms-package.3dmodel+xml` |
 
 ---
 

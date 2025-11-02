@@ -154,6 +154,7 @@ func (s *OpenSCADService) validateFormat(format string) error {
 		"stl_ascii":  true,
 		"svg":        true,
 		"pdf":        true,
+		"3mf":        true,
 	}
 
 	if !validFormats[format] {
@@ -175,6 +176,8 @@ func (s *OpenSCADService) getOutputExtension(format string) (string, string) {
 		return "svg", ""
 	case "pdf":
 		return "pdf", ""
+	case "3mf":
+		return "3mf", ""
 	default:
 		return "", ""
 	}
@@ -203,7 +206,7 @@ func (s *OpenSCADService) buildExportOptions(req *models.ExportRequest) []string
 		if req.Options.STL != nil && req.Options.STL.DecimalPrecision != nil {
 			precision := *req.Options.STL.DecimalPrecision
 			if precision >= 1 && precision <= 16 {
-				args = append(args, "-O", fmt.Sprintf("export-3mf/decimal-precision=%d", precision))
+				args = append(args, "-O", fmt.Sprintf("export-stl/decimal-precision=%d", precision))
 			}
 		}
 
@@ -256,6 +259,43 @@ func (s *OpenSCADService) buildExportOptions(req *models.ExportRequest) []string
 				args = append(args, "-O", fmt.Sprintf("export-pdf/stroke-width=%s", strconv.FormatFloat(*req.Options.PDF.StrokeWidth, 'f', -1, 64)))
 			}
 		}
+
+	case "3mf":
+		if req.Options.ThreeMF != nil {
+			if req.Options.ThreeMF.Unit != nil {
+				args = append(args, "-O", fmt.Sprintf("export-3mf/unit=%s", *req.Options.ThreeMF.Unit))
+			}
+			if req.Options.ThreeMF.DecimalPrecision != nil {
+				precision := *req.Options.ThreeMF.DecimalPrecision
+				if precision >= 1 && precision <= 16 {
+					args = append(args, "-O", fmt.Sprintf("export-3mf/decimal-precision=%d", precision))
+				}
+			}
+			if req.Options.ThreeMF.Color != nil {
+				args = append(args, "-O", fmt.Sprintf("export-3mf/color=%s", *req.Options.ThreeMF.Color))
+			}
+			if req.Options.ThreeMF.ColorMode != nil {
+				args = append(args, "-O", fmt.Sprintf("export-3mf/color-mode=%s", *req.Options.ThreeMF.ColorMode))
+			}
+			if req.Options.ThreeMF.MaterialType != nil {
+				args = append(args, "-O", fmt.Sprintf("export-3mf/material-type=%s", *req.Options.ThreeMF.MaterialType))
+			}
+			if req.Options.ThreeMF.AddMetadata != nil {
+				args = append(args, "-O", fmt.Sprintf("export-3mf/add-meta-data=%t", *req.Options.ThreeMF.AddMetadata))
+			}
+			if req.Options.ThreeMF.MetadataTitle != nil {
+				args = append(args, "-O", fmt.Sprintf("export-3mf/meta-data-title=%s", *req.Options.ThreeMF.MetadataTitle))
+			}
+			if req.Options.ThreeMF.MetadataDesigner != nil {
+				args = append(args, "-O", fmt.Sprintf("export-3mf/meta-data-designer=%s", *req.Options.ThreeMF.MetadataDesigner))
+			}
+			if req.Options.ThreeMF.MetadataDesc != nil {
+				args = append(args, "-O", fmt.Sprintf("export-3mf/meta-data-description=%s", *req.Options.ThreeMF.MetadataDesc))
+			}
+			if req.Options.ThreeMF.MetadataCopyright != nil {
+				args = append(args, "-O", fmt.Sprintf("export-3mf/meta-data-copyright=%s", *req.Options.ThreeMF.MetadataCopyright))
+			}
+		}
 	}
 
 	return args
@@ -271,6 +311,8 @@ func (s *OpenSCADService) getContentType(format string) string {
 		return "image/svg+xml"
 	case "pdf":
 		return "application/pdf"
+	case "3mf":
+		return "application/vnd.ms-package.3dmodel+xml"
 	default:
 		return "application/octet-stream"
 	}

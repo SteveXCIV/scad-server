@@ -13,6 +13,7 @@ type ExportOptions struct {
 	STL *STLOptions `json:"stl,omitempty"`
 	SVG *SVGOptions `json:"svg,omitempty"`
 	PDF *PDFOptions `json:"pdf,omitempty"`
+	ThreeMF *ThreeMFOptions `json:"3mf,omitempty"`
 }
 
 // PNGOptions contains PNG export options
@@ -46,6 +47,20 @@ type PDFOptions struct {
 	Stroke      *bool    `json:"stroke,omitempty" example:"true"`
 	StrokeColor *string  `json:"stroke_color,omitempty" example:"black"`
 	StrokeWidth *float64 `json:"stroke_width,omitempty" example:"0.35"`
+}
+
+// ThreeMFOptions contains 3MF export options
+type ThreeMFOptions struct {
+	Unit             *string `json:"unit,omitempty" example:"millimeter" enums:"micron,millimeter,centimeter,meter,inch,foot"`
+	DecimalPrecision *int    `json:"decimal_precision,omitempty" example:"6" minimum:"1" maximum:"16"`
+	Color            *string `json:"color,omitempty" example:"#f9d72c"`
+	ColorMode        *string `json:"color_mode,omitempty" example:"model" enums:"model,none,selected-only"`
+	MaterialType     *string `json:"material_type,omitempty" example:"color" enums:"color,basematerial"`
+	AddMetadata      *bool   `json:"add_metadata,omitempty" example:"true"`
+	MetadataTitle    *string `json:"metadata_title,omitempty" example:"My Model"`
+	MetadataDesigner *string `json:"metadata_designer,omitempty" example:"Designer Name"`
+	MetadataDesc     *string `json:"metadata_description,omitempty" example:"Model description"`
+	MetadataCopyright *string `json:"metadata_copyright,omitempty" example:"Copyright info"`
 }
 
 // SummaryRequest represents the request body for summary endpoint

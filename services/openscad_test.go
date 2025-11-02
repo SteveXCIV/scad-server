@@ -19,6 +19,7 @@ func TestValidateFormat(t *testing.T) {
 		{"Valid STL ASCII", "stl_ascii", false},
 		{"Valid SVG", "svg", false},
 		{"Valid PDF", "pdf", false},
+		{"Valid 3MF", "3mf", false},
 		{"Invalid format", "invalid", true},
 		{"Empty format", "", true},
 	}
@@ -47,6 +48,7 @@ func TestGetOutputExtension(t *testing.T) {
 		{"STL ASCII", "stl_ascii", "stl", "asciistl"},
 		{"SVG", "svg", "svg", ""},
 		{"PDF", "pdf", "pdf", ""},
+		{"3MF", "3mf", "3mf", ""},
 	}
 
 	for _, tt := range tests {
@@ -75,6 +77,7 @@ func TestGetContentType(t *testing.T) {
 		{"STL ASCII", "stl_ascii", "application/octet-stream"},
 		{"SVG", "svg", "image/svg+xml"},
 		{"PDF", "pdf", "application/pdf"},
+		{"3MF", "3mf", "application/vnd.ms-package.3dmodel+xml"},
 		{"Unknown", "unknown", "application/octet-stream"},
 	}
 
@@ -160,6 +163,51 @@ func TestBuildExportOptions(t *testing.T) {
 		args := service.buildExportOptions(req)
 		if len(args) != 0 {
 			t.Errorf("Expected 0 args, got %d", len(args))
+		}
+	})
+
+	t.Run("3MF options", func(t *testing.T) {
+		unit := "centimeter"
+		precision := 8
+		color := "#ff0000"
+		colorMode := "model"
+		addMetadata := true
+		title := "Test Model"
+		req := &models.ExportRequest{
+			Format: "3mf",
+			Options: models.ExportOptions{
+				ThreeMF: &models.ThreeMFOptions{
+					Unit:             &unit,
+					DecimalPrecision: &precision,
+					Color:            &color,
+					ColorMode:        &colorMode,
+					AddMetadata:      &addMetadata,
+					MetadataTitle:    &title,
+				},
+			},
+		}
+		args := service.buildExportOptions(req)
+		if len(args) < 10 {
+			t.Errorf("Expected at least 10 args for 3MF options, got %d", len(args))
+		}
+		// Check that 3MF specific options are present
+		hasUnit := false
+		hasPrecision := false
+		for i := 0; i < len(args)-1; i++ {
+			if args[i] == "-O" {
+				if args[i+1] == "export-3mf/unit=centimeter" {
+					hasUnit = true
+				}
+				if args[i+1] == "export-3mf/decimal-precision=8" {
+					hasPrecision = true
+				}
+			}
+		}
+		if !hasUnit {
+			t.Errorf("Expected unit option in args")
+		}
+		if !hasPrecision {
+			t.Errorf("Expected precision option in args")
 		}
 	})
 }
