@@ -41,3 +41,7 @@ tmp/
 docs/docs.go
 docs/swagger.json
 docs/swagger.yaml
+
+# MacOS Stuff
+.DS_Store
+
