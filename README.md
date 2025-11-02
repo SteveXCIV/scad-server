@@ -204,11 +204,23 @@ curl -X POST http://localhost:8000/openscad/v1/summary \
 
 ## API Documentation
 
+### Interactive/Human-readable
+
 Once the server is running, you can access the interactive Swagger documentation at:
 
 ```
 http://localhost:8000/swagger/index.html
 ```
+
+### Spec/Machine-readable
+
+Additionally, the JSON API spec can be found at:
+
+```
+http://localhost:8000/swagger/doc.json
+```
+
+Tools able to dynamically generate API clients can use this spec file to generate a client for scad-server.
 
 ## Configuration
 
