@@ -1,0 +1,10 @@
+{
+  "scad_content": "cube([10,10,10]);",
+  "format": "png",
+  "options": {
+    "png": {
+      "width": 800,
+      "height": 600
+    }
+  }
+}

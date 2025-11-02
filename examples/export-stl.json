@@ -1,0 +1,9 @@
+{
+  "scad_content": "sphere(r=5);",
+  "format": "stl_binary",
+  "options": {
+    "stl": {
+      "decimal_precision": 6
+    }
+  }
+}

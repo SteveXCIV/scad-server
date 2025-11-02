@@ -1,0 +1,13 @@
+{
+  "scad_content": "circle(r=10);",
+  "format": "svg",
+  "options": {
+    "svg": {
+      "fill": true,
+      "fill_color": "blue",
+      "stroke": true,
+      "stroke_color": "black",
+      "stroke_width": 0.5
+    }
+  }
+}

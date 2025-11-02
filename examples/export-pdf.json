@@ -1,0 +1,12 @@
+{
+  "scad_content": "square([20,20]);",
+  "format": "pdf",
+  "options": {
+    "pdf": {
+      "paper_size": "a4",
+      "orientation": "landscape",
+      "show_grid": true,
+      "grid_size": 10
+    }
+  }
+}

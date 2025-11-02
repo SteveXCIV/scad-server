@@ -1,0 +1,29 @@
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md
+DESIGN.md
+openscad-help*.txt
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Test files
+*_test.go
+
+# Temporary files
+tmp/
+*.tmp
+
+# Build artifacts
+bin/
+dist/
+
+# Sample files
+examples/
