@@ -24,7 +24,7 @@ echo ""
 # Format check
 echo "3. Checking code formatting..."
 if [ -n "$(gofmt -l .)" ]; then
-    echo "✗ Code is not formatted. Run: make fmt"
+    echo "✗ Code is not formatted. Run: just fmt"
     exit 1
 fi
 echo "✓ Code is formatted"
@@ -74,8 +74,8 @@ echo "✓ All verification checks passed!"
 echo "========================================"
 echo ""
 echo "Next steps:"
-echo "  - Run the server: ./bin/scad-server"
-echo "  - Run with make: make run"
-echo "  - Build Docker: make docker-build"
+echo "  - Run the server: just run"
+echo "  - Build: just build"
+echo "  - Build Docker: just docker-build"
 echo "  - View docs: http://localhost:8080/swagger/index.html"
 echo ""

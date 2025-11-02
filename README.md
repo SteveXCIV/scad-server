@@ -63,6 +63,7 @@ Returns the health status of the API.
 - Go 1.21 or later
 - OpenSCAD (for local development)
 - Docker (for containerized deployment)
+- just (task runner) - https://github.com/casey/just
 
 ### Local Development
 
@@ -85,7 +86,7 @@ swag init
 
 4. Run the server:
 ```bash
-go run main.go
+just run
 ```
 
 The server will start on `http://localhost:8080`.
@@ -94,12 +95,12 @@ The server will start on `http://localhost:8080`.
 
 1. Build the Docker image:
 ```bash
-docker build -t scad-server .
+just docker-build
 ```
 
 2. Run the container:
 ```bash
-docker run -p 8080:8080 scad-server
+just docker-run
 ```
 
 ## Usage Examples
@@ -208,26 +209,35 @@ The server can be configured using environment variables:
 
 Example:
 ```bash
-PORT=3000 GIN_MODE=debug go run main.go
+PORT=3000 GIN_MODE=debug just run
 ```
 
 ## Testing
 
 Run all tests:
 ```bash
-go test ./...
-```
-
-Run tests with coverage:
-```bash
-go test -v -cover ./...
+just test
 ```
 
 Run tests with coverage report:
 ```bash
-go test -v -coverprofile=coverage.out ./...
-go tool cover -html=coverage.out
+just test-coverage
 ```
+
+## Available Commands
+
+List all available tasks:
+```bash
+just --list
+```
+
+Common commands:
+- `just build` - Build the application
+- `just test` - Run tests
+- `just run` - Run the server
+- `just clean` - Clean build artifacts
+- `just docker-build` - Build Docker image
+- `just docker-run` - Run Docker container
 
 ## Project Structure
 
@@ -244,6 +254,7 @@ go tool cover -html=coverage.out
 │   └── openscad_test.go
 ├── docs/                   # Swagger documentation (generated)
 ├── Dockerfile              # Docker configuration
+├── justfile                # Task runner configuration
 ├── .gitignore              # Git ignore file
 ├── .dockerignore           # Docker ignore file
 ├── go.mod                  # Go module file
