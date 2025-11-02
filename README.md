@@ -95,7 +95,7 @@ The server will start on `http://localhost:8000`.
 
 ### Docker Deployment
 
-**Note:** The latest stable OpenSCAD Docker images are only available for AMD64 architecture (Debian Bookworm at time of writing). The `latest` tag at time of writing uses Debian Buster which has been archived. For ARM64 systems, you may need to build with platform emulation. I was able to build this on an M1 Mac, but YMMV.
+This project uses the OpenSCAD Trixie development build, which provides built-in EGL support for headless rendering and supports both AMD64 and ARM64 architectures.
 
 1. Build the Docker image:
 ```bash
@@ -107,7 +107,7 @@ just docker-build
 just docker-run
 ```
 
-For AMD64 platform specifically:
+For a specific platform:
 ```bash
 docker build --platform linux/amd64 -t scad-server:latest .
 docker run --platform linux/amd64 -p 8000:8000 scad-server:latest
