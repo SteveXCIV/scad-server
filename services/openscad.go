@@ -19,6 +19,12 @@ const (
 	openscadCmd    = "openscad"
 )
 
+// OpenSCADExporter defines the interface for OpenSCAD operations
+type OpenSCADExporter interface {
+	Export(req *models.ExportRequest) ([]byte, string, error)
+	Summary(req *models.SummaryRequest) (*models.SummaryResponse, error)
+}
+
 // OpenSCADService provides OpenSCAD operations
 type OpenSCADService struct {
 	timeout time.Duration

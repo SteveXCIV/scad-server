@@ -10,13 +10,20 @@ import (
 
 // Handler provides HTTP handlers
 type Handler struct {
-	openscadService *services.OpenSCADService
+	openscadService services.OpenSCADExporter
 }
 
-// NewHandler creates a new handler
+// NewHandler creates a new handler with the default OpenSCAD service
 func NewHandler() *Handler {
 	return &Handler{
 		openscadService: services.NewOpenSCADService(),
+	}
+}
+
+// NewHandlerWithService creates a new handler with a custom OpenSCAD exporter
+func NewHandlerWithService(exporter services.OpenSCADExporter) *Handler {
+	return &Handler{
+		openscadService: exporter,
 	}
 }
 

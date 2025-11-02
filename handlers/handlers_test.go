@@ -9,10 +9,37 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/stevexciv/scad-server/models"
+	"github.com/stevexciv/scad-server/services"
 )
 
 func init() {
 	gin.SetMode(gin.TestMode)
+}
+
+// MockOpenSCADExporter is a mock implementation of OpenSCADExporter for testing
+type MockOpenSCADExporter struct {
+	ExportFunc func(req *models.ExportRequest) ([]byte, string, error)
+	SummaryFunc func(req *models.SummaryRequest) (*models.SummaryResponse, error)
+}
+
+func (m *MockOpenSCADExporter) Export(req *models.ExportRequest) ([]byte, string, error) {
+	if m.ExportFunc != nil {
+		return m.ExportFunc(req)
+	}
+	// Default behavior: return mock data
+	return []byte("mock export data"), "application/octet-stream", nil
+}
+
+func (m *MockOpenSCADExporter) Summary(req *models.SummaryRequest) (*models.SummaryResponse, error) {
+	if m.SummaryFunc != nil {
+		return m.SummaryFunc(req)
+	}
+	// Default behavior: return mock summary
+	return &models.SummaryResponse{
+		Summary: map[string]interface{}{
+			"facets": 6,
+		},
+	}, nil
 }
 
 func TestHealthCheck(t *testing.T) {
@@ -164,7 +191,16 @@ func TestSummaryEndpoint_MissingRequiredFields(t *testing.T) {
 }
 
 func TestSummaryEndpoint_ValidRequest(t *testing.T) {
-	router := setupRouter()
+	mock := &MockOpenSCADExporter{
+		SummaryFunc: func(req *models.SummaryRequest) (*models.SummaryResponse, error) {
+			return &models.SummaryResponse{
+				Summary: map[string]interface{}{
+					"facets": 6,
+				},
+			}, nil
+		},
+	}
+	router := setupRouterWithMock(mock)
 
 	reqBody := models.SummaryRequest{
 		ScadContent: "cube([10,10,10]);",
@@ -183,14 +219,38 @@ func TestSummaryEndpoint_ValidRequest(t *testing.T) {
 	req.Header.Set("Content-Type", "application/json")
 	router.ServeHTTP(w, req)
 
-	// May fail if OpenSCAD is not installed, but should return proper error
-	if w.Code != http.StatusOK && w.Code != http.StatusInternalServerError {
-		t.Errorf("Expected status 200 or 500, got %d", w.Code)
+	if w.Code != http.StatusOK {
+		t.Errorf("Expected status 200, got %d", w.Code)
+	}
+
+	var response models.SummaryResponse
+	if err := json.Unmarshal(w.Body.Bytes(), &response); err != nil {
+		t.Errorf("Failed to parse response: %v", err)
+	}
+
+	if response.Summary == nil {
+		t.Errorf("Expected summary data, got nil")
 	}
 }
 
 func TestExportEndpoint_ValidFormats(t *testing.T) {
-	router := setupRouter()
+	mock := &MockOpenSCADExporter{
+		ExportFunc: func(req *models.ExportRequest) ([]byte, string, error) {
+			contentType := "application/octet-stream"
+			switch req.Format {
+			case "png":
+				contentType = "image/png"
+			case "svg":
+				contentType = "image/svg+xml"
+			case "pdf":
+				contentType = "application/pdf"
+			case "stl_binary", "stl_ascii":
+				contentType = "application/octet-stream"
+			}
+			return []byte("mock export data"), contentType, nil
+		},
+	}
+	router := setupRouterWithMock(mock)
 
 	formats := []string{"png", "stl_binary", "stl_ascii", "svg", "pdf"}
 
@@ -213,9 +273,8 @@ func TestExportEndpoint_ValidFormats(t *testing.T) {
 			req.Header.Set("Content-Type", "application/json")
 			router.ServeHTTP(w, req)
 
-			// May fail if OpenSCAD is not installed, but should return proper error
-			if w.Code != http.StatusOK && w.Code != http.StatusInternalServerError {
-				t.Errorf("Expected status 200 or 500, got %d", w.Code)
+			if w.Code != http.StatusOK {
+				t.Errorf("Expected status 200, got %d: %s", w.Code, w.Body.String())
 			}
 		})
 	}
@@ -224,6 +283,21 @@ func TestExportEndpoint_ValidFormats(t *testing.T) {
 func setupRouter() *gin.Engine {
 	router := gin.Default()
 	h := NewHandler()
+
+	router.GET("/health", h.HealthCheck)
+
+	v1 := router.Group("/openscad/v1")
+	{
+		v1.POST("/export", h.Export)
+		v1.POST("/summary", h.Summary)
+	}
+
+	return router
+}
+
+func setupRouterWithMock(exporter services.OpenSCADExporter) *gin.Engine {
+	router := gin.Default()
+	h := NewHandlerWithService(exporter)
 
 	router.GET("/health", h.HealthCheck)
 
