@@ -64,7 +64,7 @@ Returns the health status of the API.
 
 ### Prerequisites
 - Go 1.23 or later
-- OpenSCAD on your PATH (for local development)
+- OpenSCAD v2025.10.27 on your PATH (for local development - **WARNING:** older versions likely will not support all endpoints)
 - Docker (for containerized deployment)
 - just (task runner):  https://github.com/casey/just (optional but **very** helpful)
 - golangci-lint v1.64.8 if you want to run lints locally (instructions [here](https://golangci.github.io/legacy-v1-doc/welcome/install/))
