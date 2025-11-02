@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/stevexciv/scad-server/docs"
 	"github.com/stevexciv/scad-server/handlers"
+	"github.com/stevexciv/scad-server/version"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -27,6 +28,10 @@ import (
 //
 // @BasePath /
 func main() {
+	// Log version information
+	info := version.GetInfo()
+	log.Printf("Starting scad-server (commit: %s, tag: %s)", info.Commit, info.Tag)
+
 	// Check if OpenSCAD is available
 	if err := checkOpenSCAD(); err != nil {
 		log.Fatalf("OpenSCAD not available: %v", err)

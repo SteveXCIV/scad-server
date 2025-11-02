@@ -15,7 +15,11 @@ swagger:
 
 # Build the application
 build: swagger
-    go build -o bin/scad-server .
+    #!/bin/bash
+    set -e
+    COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+    TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "unknown")
+    go build -ldflags "-X github.com/stevexciv/scad-server/version.commit=$COMMIT -X github.com/stevexciv/scad-server/version.tag=$TAG" -o bin/scad-server .
 
 # Run tests
 test:
@@ -29,7 +33,11 @@ test-coverage:
 
 # Run the application
 run: swagger
-    go run main.go
+    #!/bin/bash
+    set -e
+    COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+    TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "unknown")
+    go run -ldflags "-X github.com/stevexciv/scad-server/version.commit=$COMMIT -X github.com/stevexciv/scad-server/version.tag=$TAG" main.go
 
 # Clean build artifacts
 clean:

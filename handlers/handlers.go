@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stevexciv/scad-server/models"
 	"github.com/stevexciv/scad-server/services"
+	"github.com/stevexciv/scad-server/version"
 )
 
 // Handler provides HTTP handlers
@@ -107,7 +108,10 @@ func (h *Handler) Summary(c *gin.Context) {
 // @Success 200 {object} map[string]string
 // @Router /health [get]
 func (h *Handler) HealthCheck(c *gin.Context) {
+	info := version.GetInfo()
 	c.JSON(http.StatusOK, gin.H{
 		"status": "ok",
+		"commit": info.Commit,
+		"tag":    info.Tag,
 	})
 }

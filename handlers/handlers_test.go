@@ -65,6 +65,14 @@ func TestHealthCheck(t *testing.T) {
 	if response["status"] != "ok" {
 		t.Errorf("Expected status 'ok', got '%s'", response["status"])
 	}
+
+	if _, hasCommit := response["commit"]; !hasCommit {
+		t.Errorf("Expected 'commit' field in response")
+	}
+
+	if _, hasTag := response["tag"]; !hasTag {
+		t.Errorf("Expected 'tag' field in response")
+	}
 }
 
 func TestExportEndpoint_InvalidJSON(t *testing.T) {
