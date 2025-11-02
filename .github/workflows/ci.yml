@@ -32,6 +32,12 @@ jobs:
       - name: Download dependencies
         run: go mod download
 
+      - name: Install swag
+        run: go install github.com/swaggo/swag/cmd/swag@latest
+
+      - name: Generate Swagger docs
+        run: swag init
+
       - name: Run tests
         run: go test -v -race -coverprofile=coverage.out -covermode=atomic ./...
 
@@ -81,6 +87,12 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: '1.23'
+
+      - name: Install swag
+        run: go install github.com/swaggo/swag/cmd/swag@latest
+
+      - name: Generate Swagger docs
+        run: swag init
 
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v3
