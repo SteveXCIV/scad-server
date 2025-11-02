@@ -90,6 +90,5 @@ func checkPortAvailable(addr string) error {
 	if err != nil {
 		return err
 	}
-	listener.Close()
-	return nil
+	return listener.Close()
 }
