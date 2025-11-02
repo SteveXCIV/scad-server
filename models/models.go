@@ -9,10 +9,10 @@ type ExportRequest struct {
 
 // ExportOptions contains format-specific export options
 type ExportOptions struct {
-	PNG *PNGOptions `json:"png,omitempty"`
-	STL *STLOptions `json:"stl,omitempty"`
-	SVG *SVGOptions `json:"svg,omitempty"`
-	PDF *PDFOptions `json:"pdf,omitempty"`
+	PNG     *PNGOptions     `json:"png,omitempty"`
+	STL     *STLOptions     `json:"stl,omitempty"`
+	SVG     *SVGOptions     `json:"svg,omitempty"`
+	PDF     *PDFOptions     `json:"pdf,omitempty"`
 	ThreeMF *ThreeMFOptions `json:"3mf,omitempty"`
 }
 
@@ -51,15 +51,15 @@ type PDFOptions struct {
 
 // ThreeMFOptions contains 3MF export options
 type ThreeMFOptions struct {
-	Unit             *string `json:"unit,omitempty" example:"millimeter" enums:"micron,millimeter,centimeter,meter,inch,foot"`
-	DecimalPrecision *int    `json:"decimal_precision,omitempty" example:"6" minimum:"1" maximum:"16"`
-	Color            *string `json:"color,omitempty" example:"#f9d72c"`
-	ColorMode        *string `json:"color_mode,omitempty" example:"model" enums:"model,none,selected-only"`
-	MaterialType     *string `json:"material_type,omitempty" example:"color" enums:"color,basematerial"`
-	AddMetadata      *bool   `json:"add_metadata,omitempty" example:"true"`
-	MetadataTitle    *string `json:"metadata_title,omitempty" example:"My Model"`
-	MetadataDesigner *string `json:"metadata_designer,omitempty" example:"Designer Name"`
-	MetadataDesc     *string `json:"metadata_description,omitempty" example:"Model description"`
+	Unit              *string `json:"unit,omitempty" example:"millimeter" enums:"micron,millimeter,centimeter,meter,inch,foot"`
+	DecimalPrecision  *int    `json:"decimal_precision,omitempty" example:"6" minimum:"1" maximum:"16"`
+	Color             *string `json:"color,omitempty" example:"#f9d72c"`
+	ColorMode         *string `json:"color_mode,omitempty" example:"model" enums:"model,none,selected-only"`
+	MaterialType      *string `json:"material_type,omitempty" example:"color" enums:"color,basematerial"`
+	AddMetadata       *bool   `json:"add_metadata,omitempty" example:"true"`
+	MetadataTitle     *string `json:"metadata_title,omitempty" example:"My Model"`
+	MetadataDesigner  *string `json:"metadata_designer,omitempty" example:"Designer Name"`
+	MetadataDesc      *string `json:"metadata_description,omitempty" example:"Model description"`
 	MetadataCopyright *string `json:"metadata_copyright,omitempty" example:"Copyright info"`
 }
 

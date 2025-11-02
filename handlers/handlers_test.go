@@ -19,7 +19,7 @@ func init() {
 
 // MockOpenSCADExporter is a mock implementation of OpenSCADExporter for testing
 type MockOpenSCADExporter struct {
-	ExportFunc func(req *models.ExportRequest) ([]byte, string, error)
+	ExportFunc  func(req *models.ExportRequest) ([]byte, string, error)
 	SummaryFunc func(req *models.SummaryRequest) (*models.SummaryResponse, error)
 }
 
@@ -279,9 +279,9 @@ func TestSummaryEndpoint_ServiceError(t *testing.T) {
 
 func TestSummaryEndpoint_SummaryTypeErrors(t *testing.T) {
 	tests := []struct {
-		name       string
+		name        string
 		summaryType string
-		errMsg     string
+		errMsg      string
 	}{
 		{"Invalid summary type", "invalid", "unrecognised summary type: invalid"},
 		{"Cache summary error", "cache", "failed to retrieve cache information"},
@@ -422,9 +422,9 @@ func TestExportEndpoint_ServiceError(t *testing.T) {
 
 func TestExportEndpoint_FormatSpecificErrors(t *testing.T) {
 	tests := []struct {
-		name    string
-		format  string
-		errMsg  string
+		name   string
+		format string
+		errMsg string
 	}{
 		{"SVG 3D geometry error", "svg", "Current top level object is not a 2D object"},
 		{"PDF rendering error", "pdf", "PDF rendering not supported for 3D objects"},
