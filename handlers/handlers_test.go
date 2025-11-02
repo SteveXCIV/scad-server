@@ -19,7 +19,10 @@ func TestHealthCheck(t *testing.T) {
 	router := setupRouter()
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/health", nil)
+	req, err := http.NewRequest("GET", "/health", nil)
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
+	}
 	router.ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {
@@ -40,7 +43,10 @@ func TestExportEndpoint_InvalidJSON(t *testing.T) {
 	router := setupRouter()
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("POST", "/openscad/v1/export", bytes.NewBufferString("invalid json"))
+	req, err := http.NewRequest("POST", "/openscad/v1/export", bytes.NewBufferString("invalid json"))
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
+	}
 	req.Header.Set("Content-Type", "application/json")
 	router.ServeHTTP(w, req)
 
@@ -65,7 +71,10 @@ func TestExportEndpoint_MissingRequiredFields(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			w := httptest.NewRecorder()
-			req, _ := http.NewRequest("POST", "/openscad/v1/export", bytes.NewBufferString(tt.body))
+			req, err := http.NewRequest("POST", "/openscad/v1/export", bytes.NewBufferString(tt.body))
+			if err != nil {
+				t.Fatalf("Failed to create request: %v", err)
+			}
 			req.Header.Set("Content-Type", "application/json")
 			router.ServeHTTP(w, req)
 
@@ -84,9 +93,15 @@ func TestExportEndpoint_InvalidFormat(t *testing.T) {
 		Format:      "invalid_format",
 	}
 
-	body, _ := json.Marshal(reqBody)
+	body, err := json.Marshal(reqBody)
+	if err != nil {
+		t.Fatalf("Failed to marshal request: %v", err)
+	}
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("POST", "/openscad/v1/export", bytes.NewBuffer(body))
+	req, err := http.NewRequest("POST", "/openscad/v1/export", bytes.NewBuffer(body))
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
+	}
 	req.Header.Set("Content-Type", "application/json")
 	router.ServeHTTP(w, req)
 
@@ -108,7 +123,10 @@ func TestSummaryEndpoint_InvalidJSON(t *testing.T) {
 	router := setupRouter()
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("POST", "/openscad/v1/summary", bytes.NewBufferString("invalid json"))
+	req, err := http.NewRequest("POST", "/openscad/v1/summary", bytes.NewBufferString("invalid json"))
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
+	}
 	req.Header.Set("Content-Type", "application/json")
 	router.ServeHTTP(w, req)
 
@@ -131,7 +149,10 @@ func TestSummaryEndpoint_MissingRequiredFields(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			w := httptest.NewRecorder()
-			req, _ := http.NewRequest("POST", "/openscad/v1/summary", bytes.NewBufferString(tt.body))
+			req, err := http.NewRequest("POST", "/openscad/v1/summary", bytes.NewBufferString(tt.body))
+			if err != nil {
+				t.Fatalf("Failed to create request: %v", err)
+			}
 			req.Header.Set("Content-Type", "application/json")
 			router.ServeHTTP(w, req)
 
@@ -150,9 +171,15 @@ func TestSummaryEndpoint_ValidRequest(t *testing.T) {
 		SummaryType: "all",
 	}
 
-	body, _ := json.Marshal(reqBody)
+	body, err := json.Marshal(reqBody)
+	if err != nil {
+		t.Fatalf("Failed to marshal request: %v", err)
+	}
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("POST", "/openscad/v1/summary", bytes.NewBuffer(body))
+	req, err := http.NewRequest("POST", "/openscad/v1/summary", bytes.NewBuffer(body))
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
+	}
 	req.Header.Set("Content-Type", "application/json")
 	router.ServeHTTP(w, req)
 
@@ -174,9 +201,15 @@ func TestExportEndpoint_ValidFormats(t *testing.T) {
 				Format:      format,
 			}
 
-			body, _ := json.Marshal(reqBody)
+			body, err := json.Marshal(reqBody)
+			if err != nil {
+				t.Fatalf("Failed to marshal request: %v", err)
+			}
 			w := httptest.NewRecorder()
-			req, _ := http.NewRequest("POST", "/openscad/v1/export", bytes.NewBuffer(body))
+			req, err := http.NewRequest("POST", "/openscad/v1/export", bytes.NewBuffer(body))
+			if err != nil {
+				t.Fatalf("Failed to create request: %v", err)
+			}
 			req.Header.Set("Content-Type", "application/json")
 			router.ServeHTTP(w, req)
 
