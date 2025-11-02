@@ -33,7 +33,7 @@ func main() {
 	}
 
 	// Set Gin mode from environment variable
-	mode := os.Getenv("GIN_MODE")
+	mode := os.Getenv("SCADSRV_GIN_MODE")
 	if mode == "" {
 		mode = gin.ReleaseMode
 	}
@@ -58,7 +58,7 @@ func main() {
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// Get port from environment variable
-	port := os.Getenv("PORT")
+	port := os.Getenv("SCADSRV_PORT")
 	if port == "" {
 		port = "8000"
 	}

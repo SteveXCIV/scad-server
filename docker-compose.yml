@@ -5,8 +5,8 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - PORT=8000
-      - GIN_MODE=release
+      - SCADSRV_PORT=8000
+      - SCADSRV_GIN_MODE=release
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--output-document=-", "http://localhost:8000/health"]

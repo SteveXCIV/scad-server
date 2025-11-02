@@ -214,12 +214,12 @@ http://localhost:8000/swagger/index.html
 
 The server can be configured using environment variables:
 
-- `PORT` - Server port (default: 8000)
-- `GIN_MODE` - Gin framework mode: `debug`, `release`, or `test` (default: release)
+- `SCADSRV_PORT` - Server port (default: 8000)
+- `SCADSRV_GIN_MODE` - Gin framework mode: `debug`, `release`, or `test` (default: release)
 
 Example:
 ```bash
-PORT=3000 GIN_MODE=debug just run
+SCADSRV_PORT=3000 SCADSRV_GIN_MODE=debug just run
 ```
 
 ## Testing
