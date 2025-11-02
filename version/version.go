@@ -26,4 +26,3 @@ var Info = BuildInfo{
 	Commit: "unknown",
 	Tag:    "unknown",
 }
-
