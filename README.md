@@ -67,6 +67,7 @@ Returns the health status of the API.
 - OpenSCAD on your PATH (for local development)
 - Docker (for containerized deployment)
 - just (task runner):  https://github.com/casey/just (optional but **very** helpful)
+- golangci-lint v1.64.8 if you want to run lints locally (instructions [here](https://golangci.github.io/legacy-v1-doc/welcome/install/))
 
 ### Local Development
 
