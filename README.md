@@ -304,7 +304,7 @@ GPL-3.0 License - See COPYING file for details
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please feel free to fork the repository and submit a Pull Request.
 
 ## Support
 
