@@ -1,6 +1,6 @@
 services:
   scad-server:
-    build: .
+    image: stevexciv/scad-server:latest
     container_name: scad-server
     ports:
       - "8000:8000"

@@ -48,11 +48,11 @@ clean:
 
 # Build Docker image
 docker-build:
-    docker build -t scad-server:latest .
+    docker build -t stevexciv/scad-server:latest .
 
 # Run Docker container
 docker-run:
-    docker run -p 8000:8000 scad-server:latest
+    docker run -p 8000:8000 stevexciv/scad-server:latest
 
 # Run linter
 lint:

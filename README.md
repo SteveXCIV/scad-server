@@ -111,8 +111,8 @@ just docker-run
 
 For a specific platform:
 ```bash
-docker build --platform linux/amd64 -t scad-server:latest .
-docker run --platform linux/amd64 -p 8000:8000 scad-server:latest
+docker build --platform linux/amd64 -t stevexciv/scad-server:latest .
+docker run --platform linux/amd64 -p 8000:8000 stevexciv/scad-server:latest
 ```
 
 ## Usage Examples
