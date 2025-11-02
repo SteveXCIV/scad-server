@@ -1,7 +1,3 @@
-# Git
-.git/
-.gitignore
-
 # Documentation
 *.md
 DESIGN.md
