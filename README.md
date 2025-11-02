@@ -93,6 +93,8 @@ The server will start on `http://localhost:8080`.
 
 ### Docker Deployment
 
+**Note:** The OpenSCAD Docker images are currently only available for AMD64 architecture. The latest available image uses Debian Buster which has been archived. For ARM64 systems (Apple Silicon), you may need to build with platform emulation or run on AMD64 hardware.
+
 1. Build the Docker image:
 ```bash
 just docker-build
@@ -101,6 +103,12 @@ just docker-build
 2. Run the container:
 ```bash
 just docker-run
+```
+
+For AMD64 platform specifically:
+```bash
+docker build --platform linux/amd64 -t scad-server:latest .
+docker run --platform linux/amd64 -p 8080:8080 scad-server:latest
 ```
 
 ## Usage Examples
