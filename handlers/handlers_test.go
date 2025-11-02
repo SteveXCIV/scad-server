@@ -3,6 +3,7 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -233,6 +234,102 @@ func TestSummaryEndpoint_ValidRequest(t *testing.T) {
 	}
 }
 
+func TestSummaryEndpoint_ServiceError(t *testing.T) {
+	mock := &MockOpenSCADExporter{
+		SummaryFunc: func(req *models.SummaryRequest) (*models.SummaryResponse, error) {
+			return nil, fmt.Errorf("failed to parse SCAD file: syntax error at line 5")
+		},
+	}
+	router := setupRouterWithMock(mock)
+
+	reqBody := models.SummaryRequest{
+		ScadContent: "cube([10,10,10]);",
+		SummaryType: "all",
+	}
+
+	body, err := json.Marshal(reqBody)
+	if err != nil {
+		t.Fatalf("Failed to marshal request: %v", err)
+	}
+	w := httptest.NewRecorder()
+	req, err := http.NewRequest("POST", "/openscad/v1/summary", bytes.NewBuffer(body))
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+	router.ServeHTTP(w, req)
+
+	if w.Code != http.StatusInternalServerError {
+		t.Errorf("Expected status 500, got %d", w.Code)
+	}
+
+	var errResp models.ErrorResponse
+	if err := json.Unmarshal(w.Body.Bytes(), &errResp); err != nil {
+		t.Errorf("Failed to parse error response: %v", err)
+	}
+
+	if errResp.Error != "summary generation failed" {
+		t.Errorf("Expected error 'summary generation failed', got '%s'", errResp.Error)
+	}
+
+	if errResp.Message != "failed to parse SCAD file: syntax error at line 5" {
+		t.Errorf("Expected message 'failed to parse SCAD file: syntax error at line 5', got '%s'", errResp.Message)
+	}
+}
+
+func TestSummaryEndpoint_SummaryTypeErrors(t *testing.T) {
+	tests := []struct {
+		name       string
+		summaryType string
+		errMsg     string
+	}{
+		{"Invalid summary type", "invalid", "unrecognised summary type: invalid"},
+		{"Cache summary error", "cache", "failed to retrieve cache information"},
+		{"Geometry summary error", "geometry", "failed to compute geometry: rendering error"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mock := &MockOpenSCADExporter{
+				SummaryFunc: func(req *models.SummaryRequest) (*models.SummaryResponse, error) {
+					return nil, fmt.Errorf(tt.errMsg)
+				},
+			}
+			router := setupRouterWithMock(mock)
+
+			reqBody := models.SummaryRequest{
+				ScadContent: "cube([10,10,10]);",
+				SummaryType: tt.summaryType,
+			}
+
+			body, err := json.Marshal(reqBody)
+			if err != nil {
+				t.Fatalf("Failed to marshal request: %v", err)
+			}
+			w := httptest.NewRecorder()
+			req, err := http.NewRequest("POST", "/openscad/v1/summary", bytes.NewBuffer(body))
+			if err != nil {
+				t.Fatalf("Failed to create request: %v", err)
+			}
+			req.Header.Set("Content-Type", "application/json")
+			router.ServeHTTP(w, req)
+
+			if w.Code != http.StatusInternalServerError {
+				t.Errorf("Expected status 500, got %d", w.Code)
+			}
+
+			var errResp models.ErrorResponse
+			if err := json.Unmarshal(w.Body.Bytes(), &errResp); err != nil {
+				t.Errorf("Failed to parse error response: %v", err)
+			}
+
+			if errResp.Message != tt.errMsg {
+				t.Errorf("Expected message '%s', got '%s'", tt.errMsg, errResp.Message)
+			}
+		})
+	}
+}
+
 func TestExportEndpoint_ValidFormats(t *testing.T) {
 	mock := &MockOpenSCADExporter{
 		ExportFunc: func(req *models.ExportRequest) ([]byte, string, error) {
@@ -275,6 +372,102 @@ func TestExportEndpoint_ValidFormats(t *testing.T) {
 
 			if w.Code != http.StatusOK {
 				t.Errorf("Expected status 200, got %d: %s", w.Code, w.Body.String())
+			}
+		})
+	}
+}
+
+func TestExportEndpoint_ServiceError(t *testing.T) {
+	mock := &MockOpenSCADExporter{
+		ExportFunc: func(req *models.ExportRequest) ([]byte, string, error) {
+			return nil, "", fmt.Errorf("export service failed: geometry rendering error")
+		},
+	}
+	router := setupRouterWithMock(mock)
+
+	reqBody := models.ExportRequest{
+		ScadContent: "cube([10,10,10]);",
+		Format:      "png",
+	}
+
+	body, err := json.Marshal(reqBody)
+	if err != nil {
+		t.Fatalf("Failed to marshal request: %v", err)
+	}
+	w := httptest.NewRecorder()
+	req, err := http.NewRequest("POST", "/openscad/v1/export", bytes.NewBuffer(body))
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+	router.ServeHTTP(w, req)
+
+	if w.Code != http.StatusInternalServerError {
+		t.Errorf("Expected status 500, got %d", w.Code)
+	}
+
+	var errResp models.ErrorResponse
+	if err := json.Unmarshal(w.Body.Bytes(), &errResp); err != nil {
+		t.Errorf("Failed to parse error response: %v", err)
+	}
+
+	if errResp.Error != "export failed" {
+		t.Errorf("Expected error 'export failed', got '%s'", errResp.Error)
+	}
+
+	if errResp.Message != "export service failed: geometry rendering error" {
+		t.Errorf("Expected message 'export service failed: geometry rendering error', got '%s'", errResp.Message)
+	}
+}
+
+func TestExportEndpoint_FormatSpecificErrors(t *testing.T) {
+	tests := []struct {
+		name    string
+		format  string
+		errMsg  string
+	}{
+		{"SVG 3D geometry error", "svg", "Current top level object is not a 2D object"},
+		{"PDF rendering error", "pdf", "PDF rendering not supported for 3D objects"},
+		{"STL binary precision error", "stl_binary", "Invalid decimal precision parameter"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mock := &MockOpenSCADExporter{
+				ExportFunc: func(req *models.ExportRequest) ([]byte, string, error) {
+					return nil, "", fmt.Errorf(tt.errMsg)
+				},
+			}
+			router := setupRouterWithMock(mock)
+
+			reqBody := models.ExportRequest{
+				ScadContent: "cube([10,10,10]);",
+				Format:      tt.format,
+			}
+
+			body, err := json.Marshal(reqBody)
+			if err != nil {
+				t.Fatalf("Failed to marshal request: %v", err)
+			}
+			w := httptest.NewRecorder()
+			req, err := http.NewRequest("POST", "/openscad/v1/export", bytes.NewBuffer(body))
+			if err != nil {
+				t.Fatalf("Failed to create request: %v", err)
+			}
+			req.Header.Set("Content-Type", "application/json")
+			router.ServeHTTP(w, req)
+
+			if w.Code != http.StatusInternalServerError {
+				t.Errorf("Expected status 500, got %d", w.Code)
+			}
+
+			var errResp models.ErrorResponse
+			if err := json.Unmarshal(w.Body.Bytes(), &errResp); err != nil {
+				t.Errorf("Failed to parse error response: %v", err)
+			}
+
+			if errResp.Message != tt.errMsg {
+				t.Errorf("Expected message '%s', got '%s'", tt.errMsg, errResp.Message)
 			}
 		})
 	}
