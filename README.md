@@ -1,5 +1,9 @@
 # OpenSCAD HTTP API Server
 
+[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/SteveXCIV/scad-server/.github%2Fworkflows%2Fci.yml?style=for-the-badge)](https://github.com/SteveXCIV/scad-server/actions/workflows/ci.yml)
+[![Docker Pulls](https://img.shields.io/docker/pulls/stevexciv/scad-server?style=for-the-badge)](https://hub.docker.com/r/stevexciv/scad-server)
+[![GitHub License](https://img.shields.io/github/license/stevexciv/scad-server?style=for-the-badge)](./COPYING)
+
 An HTTP API that provides access to core OpenSCAD functionality, specifically file export and summarization. The API accepts SCAD file content via JSON payloads and returns processed results.
 
 I decided to build this because I wanted more-or-less a "CI" server for generating OpenSCAD models on my home server.
@@ -11,11 +15,12 @@ Hopefully others will find this useful as well.
 - **Summary Generation**: Get diagnostics about SCAD models
 - **Format-Specific Options**: Supports a subset of format-specific parameters from the OpenSCAD CLI
 - **OpenAPI Documentation**: Interactive API docs
-- **Docker/OCI Support**: Fits into existing homelabs already using k8s/compose/etc 
+- **Docker/OCI Support**: Fits into existing homelabs already using k8s/compose/etc
 
 ## API Endpoints
 
 ### Base URL
+
 ```
 http://localhost:8000/openscad/v1
 ```
@@ -23,6 +28,7 @@ http://localhost:8000/openscad/v1
 ### Endpoints
 
 #### 1. Export SCAD to Various Formats
+
 ```
 POST /openscad/v1/export
 ```
@@ -30,6 +36,7 @@ POST /openscad/v1/export
 Exports OpenSCAD content to PNG, STL (binary/ASCII), SVG, PDF, or 3MF format.
 
 **Supported Formats:**
+
 - `png` - Image export for visualization
 - `stl_binary` - Binary STL (useful for older slicer software)
 - `stl_ascii` - ASCII STL (useful for older slicer softwate)
@@ -38,6 +45,7 @@ Exports OpenSCAD content to PNG, STL (binary/ASCII), SVG, PDF, or 3MF format.
 - `3mf` - 3D Manufacturing Format (good option for more modern slicers)
 
 #### 2. Generate Summary Information
+
 ```
 POST /openscad/v1/summary
 ```
@@ -45,6 +53,7 @@ POST /openscad/v1/summary
 Generates summary information for OpenSCAD content.
 
 **Summary Types:**
+
 - `all` - All available summary information (default)
 - `cache` - Cache statistics
 - `time` - Timing information
@@ -54,6 +63,7 @@ Generates summary information for OpenSCAD content.
 - `area` - Surface area
 
 #### 3. Health Check
+
 ```
 GET /health
 ```
@@ -63,32 +73,37 @@ Returns the health status of the API.
 ## Installation
 
 ### Prerequisites
+
 - Go 1.23 or later
 - OpenSCAD v2025.10.27 on your PATH (for local development - **WARNING:** older versions likely will not support all endpoints)
 - Docker (for containerized deployment)
-- just (task runner):  https://github.com/casey/just (optional but **very** helpful)
+- just (task runner): https://github.com/casey/just (optional but **very** helpful)
 - golangci-lint v1.64.8 if you want to run lints locally (instructions [here](https://golangci.github.io/legacy-v1-doc/welcome/install/))
 
 ### Local Development
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/stevexciv/scad-server.git
 cd scad-server
 ```
 
 2. Install dependencies:
+
 ```bash
 go mod download
 ```
 
 3. Generate Swagger documentation:
+
 ```bash
 go install github.com/swaggo/swag/cmd/swag@latest
 swag init
 ```
 
 4. Run the server:
+
 ```bash
 just run
 ```
@@ -100,16 +115,19 @@ The server will start on `http://localhost:8000`.
 This project uses the OpenSCAD Trixie development build, which provides built-in EGL support for headless rendering and supports both AMD64 and ARM64 architectures.
 
 1. Build the Docker image:
+
 ```bash
 just docker-build
 ```
 
 2. Run the container:
+
 ```bash
 just docker-run
 ```
 
 For a specific platform:
+
 ```bash
 docker build --platform linux/amd64 -t stevexciv/scad-server:latest .
 docker run --platform linux/amd64 -p 8000:8000 stevexciv/scad-server:latest
@@ -232,6 +250,7 @@ The server can be configured using environment variables:
 - `SCADSRV_GIN_MODE` - Gin framework mode: `debug`, `release`, or `test` (default: release)
 
 Example:
+
 ```bash
 SCADSRV_PORT=3000 SCADSRV_GIN_MODE=debug just run
 ```
@@ -239,11 +258,13 @@ SCADSRV_PORT=3000 SCADSRV_GIN_MODE=debug just run
 ## Testing
 
 Run all tests:
+
 ```bash
 just test
 ```
 
 Run tests with coverage report:
+
 ```bash
 just test-coverage
 ```
@@ -251,11 +272,13 @@ just test-coverage
 ## Available Commands
 
 List all available tasks:
+
 ```bash
 just --list
 ```
 
 Common commands:
+
 - `just build` - Build the application
 - `just test` - Run tests
 - `just run` - Run the server
@@ -310,4 +333,3 @@ Contributions are welcome! Please feel free to fork the repository and submit a 
 
 For issues and questions, please open an issue on the GitHub repository:
 https://github.com/stevexciv/scad-server/issues
-
