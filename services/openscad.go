@@ -67,7 +67,7 @@ func (s *OpenSCADService) Export(req *models.ExportRequest) ([]byte, string, err
 	outputFile := filepath.Join(tmpDir, "output."+outputExt)
 
 	// Build OpenSCAD command arguments
-	args := []string{"-o", outputFile}
+	args := []string{"--info", "--debug=all", "-o", outputFile}
 
 	// Add export format if needed
 	if exportFormat != "" {
@@ -337,7 +337,7 @@ func (s *OpenSCADService) executeCommand(args []string) error {
 		if ctx.Err() == context.DeadlineExceeded {
 			return fmt.Errorf("openscad command timed out")
 		}
-		return fmt.Errorf("openscad command failed: %w, stderr: %s", err, stderr.String())
+		return fmt.Errorf("openscad command failed: %w, openscad output: %s", err, stderr.String())
 	}
 
 	return nil
