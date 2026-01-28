@@ -54,6 +54,12 @@ func (s *OpenSCADService) Export(req *models.ExportRequest) ([]byte, string, err
 		log.Printf("[OpenSCAD Export] Failed to create temp dir: %v", err)
 		return nil, "", fmt.Errorf("failed to create temp directory: %w", err)
 	}
+	defer func() {
+		if err := os.RemoveAll(tmpDir); err != nil {
+			// Log error but don't fail the operation
+			fmt.Fprintf(os.Stderr, "warning: failed to remove temp directory %s: %v\n", tmpDir, err)
+		}
+	}()
 
 	// Write SCAD content to temporary file
 	scadFile := filepath.Join(tmpDir, "input.scad")
