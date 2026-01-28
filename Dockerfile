@@ -33,7 +33,7 @@ RUN set -e && \
 FROM openscad/openscad:trixie
 
 # Install ca-certificates and wget for health checks
-RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates wget xvfb xauth && \
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates wget && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

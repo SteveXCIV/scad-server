@@ -18,7 +18,6 @@ import (
 const (
 	defaultTimeout = 5 * time.Minute
 	openscadCmd    = "openscad"
-	xvfbCmd        = "xvfb-run"
 )
 
 // OpenSCADExporter defines the interface for OpenSCAD operations
@@ -41,7 +40,6 @@ func NewOpenSCADService() *OpenSCADService {
 
 // Export exports SCAD content to the specified format
 func (s *OpenSCADService) Export(req *models.ExportRequest) ([]byte, string, error) {
-	useXvfb := req.Format == "png"
 	log.Printf("[OpenSCAD Export] Request: format=%s, options=%+v", req.Format, req.Options)
 
 	// Validate format
@@ -86,10 +84,10 @@ func (s *OpenSCADService) Export(req *models.ExportRequest) ([]byte, string, err
 
 	// Add input file
 	args = append(args, scadFile)
-	log.Printf("[OpenSCAD Export] Final command: %s %v (xvfb=%v)", openscadCmd, args, useXvfb)
+	log.Printf("[OpenSCAD Export] Final command: %s %v", openscadCmd, args)
 
 	// Execute OpenSCAD command
-	if err := s.executeCommandWithXvfb(args, useXvfb); err != nil {
+	if err := s.executeCommand(args); err != nil {
 		return nil, "", err
 	}
 
@@ -145,7 +143,7 @@ func (s *OpenSCADService) Summary(req *models.SummaryRequest) (*models.SummaryRe
 	}
 
 	// Execute OpenSCAD command
-	if err := s.executeCommandWithXvfb(args, false); err != nil {
+	if err := s.executeCommand(args); err != nil {
 		return nil, err
 	}
 
@@ -335,17 +333,11 @@ func (s *OpenSCADService) getContentType(format string) string {
 	}
 }
 
-func (s *OpenSCADService) executeCommandWithXvfb(args []string, useXvfb bool) error {
+func (s *OpenSCADService) executeCommand(args []string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), s.timeout)
 	defer cancel()
 
-	var cmd *exec.Cmd
-	if useXvfb {
-		log.Printf("[OpenSCAD Export] Using xvfb-run for command execution")
-		cmd = exec.CommandContext(ctx, xvfbCmd, append([]string{openscadCmd}, args...)...)
-	} else {
-		cmd = exec.CommandContext(ctx, openscadCmd, args...)
-	}
+	cmd := exec.CommandContext(ctx, openscadCmd, args...)
 
 	// Set working directory to temp dir if available
 	if len(args) > 0 {
