@@ -360,16 +360,6 @@ func (s *OpenSCADService) executeCommand(args []string) error {
 
 	log.Printf("[OpenSCAD Export] Running command: %v (Dir: %s)", cmd.Args, cmd.Dir)
 
-	// Run whoami for debug
-	whoamiCmd := exec.CommandContext(ctx, "whoami")
-	if cmd.Dir != "" {
-		whoamiCmd.Dir = cmd.Dir
-	}
-	var whoamiOut bytes.Buffer
-	whoamiCmd.Stdout = &whoamiOut
-	whoamiCmd.Stderr = &whoamiOut
-	_ = whoamiCmd.Run()
-	log.Printf("[OpenSCAD Export] whoami output: %s", whoamiOut.String())
 
 	err := cmd.Run()
 	log.Printf("[OpenSCAD Export] Combined output (exit code %d):\n%s", cmd.ProcessState.ExitCode(), combinedOutput.String())
