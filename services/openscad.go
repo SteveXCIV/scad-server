@@ -5,12 +5,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strconv"
 	"time"
-	"log"
 
 	"github.com/stevexciv/scad-server/models"
 )
@@ -365,7 +365,6 @@ func (s *OpenSCADService) executeCommand(args []string) error {
 	cmd.Stderr = &combinedOutput
 
 	log.Printf("[OpenSCAD Export] Running command: %v (Dir: %s)", cmd.Args, cmd.Dir)
-
 
 	err := cmd.Run()
 	log.Printf("[OpenSCAD Export] Combined output (exit code %d):\n%s", cmd.ProcessState.ExitCode(), combinedOutput.String())
