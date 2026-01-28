@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"time"
+	"log"
 
 	"github.com/stevexciv/scad-server/models"
 )
@@ -17,6 +18,7 @@ import (
 const (
 	defaultTimeout = 5 * time.Minute
 	openscadCmd    = "openscad"
+	xvfbCmd        = "xvfb-run"
 )
 
 // OpenSCADExporter defines the interface for OpenSCAD operations
@@ -39,6 +41,9 @@ func NewOpenSCADService() *OpenSCADService {
 
 // Export exports SCAD content to the specified format
 func (s *OpenSCADService) Export(req *models.ExportRequest) ([]byte, string, error) {
+	useXvfb := req.Format == "png"
+	log.Printf("[OpenSCAD Export] Request: format=%s, options=%+v", req.Format, req.Options)
+
 	// Validate format
 	if err := s.validateFormat(req.Format); err != nil {
 		return nil, "", err
@@ -46,28 +51,28 @@ func (s *OpenSCADService) Export(req *models.ExportRequest) ([]byte, string, err
 
 	// Create temporary directory
 	tmpDir, err := os.MkdirTemp("", "scad-export-*")
+	log.Printf("[OpenSCAD Export] Created temp dir: %s", tmpDir)
 	if err != nil {
+		log.Printf("[OpenSCAD Export] Failed to create temp dir: %v", err)
 		return nil, "", fmt.Errorf("failed to create temp directory: %w", err)
 	}
-	defer func() {
-		if err := os.RemoveAll(tmpDir); err != nil {
-			// Log error but don't fail the operation
-			fmt.Fprintf(os.Stderr, "warning: failed to remove temp directory %s: %v\n", tmpDir, err)
-		}
-	}()
 
 	// Write SCAD content to temporary file
 	scadFile := filepath.Join(tmpDir, "input.scad")
+	log.Printf("[OpenSCAD Export] Writing SCAD file: %s", scadFile)
 	if err := os.WriteFile(scadFile, []byte(req.ScadContent), 0644); err != nil {
+		log.Printf("[OpenSCAD Export] Failed to write SCAD file: %v", err)
 		return nil, "", fmt.Errorf("failed to write SCAD file: %w", err)
 	}
 
 	// Determine output file extension
 	outputExt, exportFormat := s.getOutputExtension(req.Format)
 	outputFile := filepath.Join(tmpDir, "output."+outputExt)
+	log.Printf("[OpenSCAD Export] Output file: %s", outputFile)
 
 	// Build OpenSCAD command arguments
-	args := []string{"--info", "--debug=all", "-o", outputFile}
+	args := []string{"--debug=all", "-o", outputFile}
+	log.Printf("[OpenSCAD Export] Initial args: %+v", args)
 
 	// Add export format if needed
 	if exportFormat != "" {
@@ -75,21 +80,28 @@ func (s *OpenSCADService) Export(req *models.ExportRequest) ([]byte, string, err
 	}
 
 	// Add format-specific options
-	args = append(args, s.buildExportOptions(req)...)
+	formatOpts := s.buildExportOptions(req)
+	log.Printf("[OpenSCAD Export] Format-specific options: %+v", formatOpts)
+	args = append(args, formatOpts...)
 
 	// Add input file
 	args = append(args, scadFile)
+	log.Printf("[OpenSCAD Export] Final command: %s %v (xvfb=%v)", openscadCmd, args, useXvfb)
 
 	// Execute OpenSCAD command
-	if err := s.executeCommand(args); err != nil {
+	if err := s.executeCommandWithXvfb(args, useXvfb); err != nil {
+		log.Printf("[OpenSCAD Export] Command failed: %v", err)
 		return nil, "", err
 	}
 
 	// Read output file
+	log.Printf("[OpenSCAD Export] Attempting to read output file: %s", outputFile)
 	data, err := os.ReadFile(outputFile)
 	if err != nil {
+		log.Printf("[OpenSCAD Export] Failed to read output file: %v", err)
 		return nil, "", fmt.Errorf("failed to read output file: %w", err)
 	}
+	log.Printf("[OpenSCAD Export] Output file read successfully, size: %d bytes", len(data))
 
 	// Get content type
 	contentType := s.getContentType(req.Format)
@@ -134,7 +146,7 @@ func (s *OpenSCADService) Summary(req *models.SummaryRequest) (*models.SummaryRe
 	}
 
 	// Execute OpenSCAD command
-	if err := s.executeCommand(args); err != nil {
+	if err := s.executeCommandWithXvfb(args, false); err != nil {
 		return nil, err
 	}
 
@@ -196,8 +208,8 @@ func (s *OpenSCADService) buildExportOptions(req *models.ExportRequest) []string
 	case "png":
 		if req.Options.PNG != nil {
 			if req.Options.PNG.Width != nil || req.Options.PNG.Height != nil {
-				width := 800
-				height := 600
+				width := 512
+				height := 512
 				if req.Options.PNG.Width != nil {
 					width = *req.Options.PNG.Width
 				}
@@ -324,21 +336,59 @@ func (s *OpenSCADService) getContentType(format string) string {
 	}
 }
 
-func (s *OpenSCADService) executeCommand(args []string) error {
+func (s *OpenSCADService) executeCommandWithXvfb(args []string, useXvfb bool) error {
 	ctx, cancel := context.WithTimeout(context.Background(), s.timeout)
 	defer cancel()
 
-	cmd := exec.CommandContext(ctx, openscadCmd, args...)
-
-	var stderr bytes.Buffer
-	cmd.Stderr = &stderr
-
-	if err := cmd.Run(); err != nil {
-		if ctx.Err() == context.DeadlineExceeded {
-			return fmt.Errorf("openscad command timed out")
-		}
-		return fmt.Errorf("openscad command failed: %w, openscad output: %s", err, stderr.String())
+	var cmd *exec.Cmd
+	if useXvfb {
+		log.Printf("[OpenSCAD Export] Using xvfb-run for command execution")
+		cmd = exec.CommandContext(ctx, xvfbCmd, append([]string{openscadCmd}, args...)...)
+	} else {
+		cmd = exec.CommandContext(ctx, openscadCmd, args...)
 	}
 
+	// Set working directory to temp dir if available
+	if len(args) > 0 {
+		// Try to find the temp dir from output or input file path
+		for _, arg := range args {
+			if filepath.IsAbs(arg) {
+				dir := filepath.Dir(arg)
+				if _, err := os.Stat(dir); err == nil {
+					cmd.Dir = dir
+					log.Printf("[OpenSCAD Export] Set working directory: %s", dir)
+					break
+				}
+			}
+		}
+	}
+
+	var combinedOutput bytes.Buffer
+	cmd.Stdout = &combinedOutput
+	cmd.Stderr = &combinedOutput
+
+	log.Printf("[OpenSCAD Export] Running command: %v (Dir: %s)", cmd.Args, cmd.Dir)
+
+	// Run whoami for debug
+	whoamiCmd := exec.CommandContext(ctx, "whoami")
+	if cmd.Dir != "" {
+		whoamiCmd.Dir = cmd.Dir
+	}
+	var whoamiOut bytes.Buffer
+	whoamiCmd.Stdout = &whoamiOut
+	whoamiCmd.Stderr = &whoamiOut
+	_ = whoamiCmd.Run()
+	log.Printf("[OpenSCAD Export] whoami output: %s", whoamiOut.String())
+
+	err := cmd.Run()
+	log.Printf("[OpenSCAD Export] Combined output (exit code %d):\n%s", cmd.ProcessState.ExitCode(), combinedOutput.String())
+	if err != nil || cmd.ProcessState.ExitCode() != 0 {
+		if ctx.Err() == context.DeadlineExceeded {
+			log.Printf("[OpenSCAD Export] Command timed out")
+			return fmt.Errorf("openscad command timed out")
+		}
+		log.Printf("[OpenSCAD Export] Command failed: %v", err)
+		return fmt.Errorf("openscad command failed: %w, output: %s", err, combinedOutput.String())
+	}
 	return nil
 }
