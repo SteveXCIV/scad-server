@@ -207,8 +207,8 @@ func (s *OpenSCADService) buildExportOptions(req *models.ExportRequest) []string
 	case "png":
 		if req.Options.PNG != nil {
 			if req.Options.PNG.Width != nil || req.Options.PNG.Height != nil {
-				width := 512
-				height := 512
+				width := 800
+				height := 600
 				if req.Options.PNG.Width != nil {
 					width = *req.Options.PNG.Width
 				}
