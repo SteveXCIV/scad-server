@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -56,6 +57,7 @@ func (h *Handler) Export(c *gin.Context) {
 		if err.Error() == "unsupported format: "+req.Format {
 			statusCode = http.StatusBadRequest
 		}
+		log.Printf("OpenSCAD export error: %v", err)
 		c.JSON(statusCode, models.ErrorResponse{
 			Error:   "export failed",
 			Message: err.Error(),
