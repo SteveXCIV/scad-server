@@ -90,7 +90,6 @@ func (s *OpenSCADService) Export(req *models.ExportRequest) ([]byte, string, err
 
 	// Execute OpenSCAD command
 	if err := s.executeCommandWithXvfb(args, useXvfb); err != nil {
-		log.Printf("[OpenSCAD Export] Command failed: %v", err)
 		return nil, "", err
 	}
 
