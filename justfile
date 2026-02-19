@@ -44,7 +44,7 @@ clean:
     rm -rf bin/
     rm -rf tmp/
     rm -f coverage.out coverage.html
-    rm -f *.stl *.png *.svg *.pdf *.scad
+    rm -f *.stl *.png *.svg *.pdf *.scad *.webp *.avif
 
 # Build Docker image
 docker-build:
