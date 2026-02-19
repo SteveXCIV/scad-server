@@ -36,6 +36,22 @@ curl -X POST http://localhost:8000/openscad/v1/export \
   --output square.pdf
 ```
 
+### Export to WebP
+```bash
+curl -X POST http://localhost:8000/openscad/v1/export \
+  -H "Content-Type: application/json" \
+  -d @examples/export-webp.json \
+  --output cube.webp
+```
+
+### Export to AVIF
+```bash
+curl -X POST http://localhost:8000/openscad/v1/export \
+  -H "Content-Type: application/json" \
+  -d @examples/export-avif.json \
+  --output cube.avif
+```
+
 ### Generate Summary
 ```bash
 curl -X POST http://localhost:8000/openscad/v1/summary \

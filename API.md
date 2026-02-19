@@ -47,7 +47,7 @@ Export OpenSCAD content to various formats.
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | scad_content | string | Yes | The OpenSCAD code to export |
-| format | string | Yes | Output format: `png`, `stl_binary`, `stl_ascii`, `svg`, `pdf`, `3mf` |
+| format | string | Yes | Output format: `png`, `stl_binary`, `stl_ascii`, `svg`, `pdf`, `3mf`, `webp`, `avif` |
 | options | object | No | Format-specific options (see below) |
 
 #### Format-Specific Options
@@ -58,6 +58,8 @@ Export OpenSCAD content to various formats.
 |-------|------|----------|---------|-------------|
 | width | integer | No | 800 | Image width in pixels |
 | height | integer | No | 600 | Image height in pixels |
+
+> **Note:** WebP and AVIF formats reuse `options.png` for dimension customization. OpenSCAD renders to PNG first, then the server converts to the requested format.
 
 ##### STL Options (`options.stl`)
 
@@ -297,6 +299,42 @@ curl -X POST http://localhost:8000/openscad/v1/export \
   --output cube.3mf
 ```
 
+### Export a Cube to WebP
+
+```bash
+curl -X POST http://localhost:8000/openscad/v1/export \
+  -H "Content-Type: application/json" \
+  -d '{
+    "scad_content": "cube([10,10,10]);",
+    "format": "webp",
+    "options": {
+      "png": {
+        "width": 800,
+        "height": 600
+      }
+    }
+  }' \
+  --output cube.webp
+```
+
+### Export a Cube to AVIF
+
+```bash
+curl -X POST http://localhost:8000/openscad/v1/export \
+  -H "Content-Type: application/json" \
+  -d '{
+    "scad_content": "cube([10,10,10]);",
+    "format": "avif",
+    "options": {
+      "png": {
+        "width": 800,
+        "height": 600
+      }
+    }
+  }' \
+  --output cube.avif
+```
+
 ### Generate Complete Summary
 
 ```bash
@@ -366,6 +404,8 @@ Currently, no rate limiting is implemented. Consider adding rate limiting in pro
 | svg | `image/svg+xml` |
 | pdf | `application/pdf` |
 | 3mf | `application/vnd.ms-package.3dmodel+xml` |
+| webp | `image/webp` |
+| avif | `image/avif` |
 
 ---
 
