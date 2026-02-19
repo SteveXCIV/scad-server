@@ -16,7 +16,8 @@ type ExportOptions struct {
 	ThreeMF *ThreeMFOptions `json:"3mf,omitempty"`
 }
 
-// PNGOptions contains PNG export options
+// PNGOptions contains PNG export options.
+// Also used for webp and avif formats (which render via PNG internally).
 type PNGOptions struct {
 	Width  *int `json:"width,omitempty" example:"800"`
 	Height *int `json:"height,omitempty" example:"600"`
