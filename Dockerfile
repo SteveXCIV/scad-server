@@ -1,10 +1,12 @@
 # Build stage
-FROM golang:1.23-alpine AS builder
+FROM golang:1.23-bookworm AS builder
 
 WORKDIR /app
 
-# Install git for version info
-RUN apk add --no-cache git
+# Install git for version info, and C libraries for image conversion (CGO)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git gcc libc-dev libwebp-dev libaom-dev && \
+    rm -rf /var/lib/apt/lists/*
 
 # Copy go mod files
 COPY go.mod go.sum ./
@@ -25,15 +27,16 @@ RUN swag init
 RUN set -e && \
     COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown") && \
     TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "unknown") && \
-    CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo \
+    CGO_ENABLED=1 GOOS=linux go build \
       -ldflags "-X github.com/stevexciv/scad-server/version.commit=$COMMIT -X github.com/stevexciv/scad-server/version.tag=$TAG" \
       -o scad-server .
 
 # Final stage
 FROM openscad/openscad:trixie
 
-# Install ca-certificates and wget for health checks
-RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates wget && \
+# Install ca-certificates, wget for health checks, and runtime libraries for image conversion
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates wget libwebp7 libaom3 && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
