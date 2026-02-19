@@ -351,13 +351,17 @@ func TestExportEndpoint_ValidFormats(t *testing.T) {
 				contentType = "application/pdf"
 			case "stl_binary", "stl_ascii":
 				contentType = "application/octet-stream"
+			case "webp":
+				contentType = "image/webp"
+			case "avif":
+				contentType = "image/avif"
 			}
 			return []byte("mock export data"), contentType, nil
 		},
 	}
 	router := setupRouterWithMock(mock)
 
-	formats := []string{"png", "stl_binary", "stl_ascii", "svg", "pdf"}
+	formats := []string{"png", "stl_binary", "stl_ascii", "svg", "pdf", "webp", "avif"}
 
 	for _, format := range formats {
 		t.Run(format, func(t *testing.T) {

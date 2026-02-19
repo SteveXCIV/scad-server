@@ -20,6 +20,8 @@ func TestValidateFormat(t *testing.T) {
 		{"Valid SVG", "svg", false},
 		{"Valid PDF", "pdf", false},
 		{"Valid 3MF", "3mf", false},
+		{"Valid WebP", "webp", false},
+		{"Valid AVIF", "avif", false},
 		{"Invalid format", "invalid", true},
 		{"Empty format", "", true},
 	}
@@ -49,6 +51,8 @@ func TestGetOutputExtension(t *testing.T) {
 		{"SVG", "svg", "svg", ""},
 		{"PDF", "pdf", "pdf", ""},
 		{"3MF", "3mf", "3mf", ""},
+		{"WebP", "webp", "png", ""},
+		{"AVIF", "avif", "png", ""},
 	}
 
 	for _, tt := range tests {
@@ -78,6 +82,8 @@ func TestGetContentType(t *testing.T) {
 		{"SVG", "svg", "image/svg+xml"},
 		{"PDF", "pdf", "application/pdf"},
 		{"3MF", "3mf", "application/vnd.ms-package.3dmodel+xml"},
+		{"WebP", "webp", "image/webp"},
+		{"AVIF", "avif", "image/avif"},
 		{"Unknown", "unknown", "application/octet-stream"},
 	}
 
@@ -153,6 +159,54 @@ func TestBuildExportOptions(t *testing.T) {
 		args := service.buildExportOptions(req)
 		if len(args) != 6 {
 			t.Errorf("Expected 6 args, got %d", len(args))
+		}
+	})
+
+	t.Run("WebP options (reuses PNG)", func(t *testing.T) {
+		width := 800
+		height := 600
+		req := &models.ExportRequest{
+			Format: "webp",
+			Options: models.ExportOptions{
+				PNG: &models.PNGOptions{
+					Width:  &width,
+					Height: &height,
+				},
+			},
+		}
+		args := service.buildExportOptions(req)
+		if len(args) != 2 {
+			t.Errorf("Expected 2 args, got %d", len(args))
+		}
+		if args[0] != "--imgsize" {
+			t.Errorf("Expected --imgsize, got %s", args[0])
+		}
+		if args[1] != "800,600" {
+			t.Errorf("Expected 800,600, got %s", args[1])
+		}
+	})
+
+	t.Run("AVIF options (reuses PNG)", func(t *testing.T) {
+		width := 640
+		height := 480
+		req := &models.ExportRequest{
+			Format: "avif",
+			Options: models.ExportOptions{
+				PNG: &models.PNGOptions{
+					Width:  &width,
+					Height: &height,
+				},
+			},
+		}
+		args := service.buildExportOptions(req)
+		if len(args) != 2 {
+			t.Errorf("Expected 2 args, got %d", len(args))
+		}
+		if args[0] != "--imgsize" {
+			t.Errorf("Expected --imgsize, got %s", args[0])
+		}
+		if args[1] != "640,480" {
+			t.Errorf("Expected 640,480, got %s", args[1])
 		}
 	})
 
