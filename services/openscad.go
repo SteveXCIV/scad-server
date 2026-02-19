@@ -106,6 +106,22 @@ func (s *OpenSCADService) Export(req *models.ExportRequest) ([]byte, string, err
 	}
 	log.Printf("[OpenSCAD Export] Output file read successfully, size: %d bytes", len(data))
 
+	// Post-process: convert PNG to target format if needed
+	switch req.Format {
+	case "webp":
+		data, err = convertPNGToWebP(data)
+		if err != nil {
+			log.Printf("[OpenSCAD Export] Failed to convert to WebP: %v", err)
+			return nil, "", fmt.Errorf("failed to convert to WebP: %w", err)
+		}
+	case "avif":
+		data, err = convertPNGToAVIF(data)
+		if err != nil {
+			log.Printf("[OpenSCAD Export] Failed to convert to AVIF: %v", err)
+			return nil, "", fmt.Errorf("failed to convert to AVIF: %w", err)
+		}
+	}
+
 	// Get content type
 	contentType := s.getContentType(req.Format)
 
@@ -176,6 +192,8 @@ func (s *OpenSCADService) validateFormat(format string) error {
 		"svg":        true,
 		"pdf":        true,
 		"3mf":        true,
+		"webp":       true,
+		"avif":       true,
 	}
 
 	if !validFormats[format] {
@@ -199,6 +217,9 @@ func (s *OpenSCADService) getOutputExtension(format string) (string, string) {
 		return "pdf", ""
 	case "3mf":
 		return "3mf", ""
+	case "webp", "avif":
+		// Render as PNG first, then convert to target format
+		return "png", ""
 	default:
 		return "", ""
 	}
@@ -208,7 +229,7 @@ func (s *OpenSCADService) buildExportOptions(req *models.ExportRequest) []string
 	var args []string
 
 	switch req.Format {
-	case "png":
+	case "png", "webp", "avif":
 		if req.Options.PNG != nil {
 			if req.Options.PNG.Width != nil || req.Options.PNG.Height != nil {
 				width := 800
@@ -334,6 +355,10 @@ func (s *OpenSCADService) getContentType(format string) string {
 		return "application/pdf"
 	case "3mf":
 		return "application/vnd.ms-package.3dmodel+xml"
+	case "webp":
+		return "image/webp"
+	case "avif":
+		return "image/avif"
 	default:
 		return "application/octet-stream"
 	}
