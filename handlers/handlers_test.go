@@ -3,6 +3,7 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -300,7 +301,7 @@ func TestSummaryEndpoint_SummaryTypeErrors(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &MockOpenSCADExporter{
 				SummaryFunc: func(req *models.SummaryRequest) (*models.SummaryResponse, error) {
-					return nil, fmt.Errorf(tt.errMsg)
+					return nil, errors.New(tt.errMsg)
 				},
 			}
 			router := setupRouterWithMock(mock)
@@ -351,13 +352,17 @@ func TestExportEndpoint_ValidFormats(t *testing.T) {
 				contentType = "application/pdf"
 			case "stl_binary", "stl_ascii":
 				contentType = "application/octet-stream"
+			case "webp":
+				contentType = "image/webp"
+			case "avif":
+				contentType = "image/avif"
 			}
 			return []byte("mock export data"), contentType, nil
 		},
 	}
 	router := setupRouterWithMock(mock)
 
-	formats := []string{"png", "stl_binary", "stl_ascii", "svg", "pdf"}
+	formats := []string{"png", "stl_binary", "stl_ascii", "svg", "pdf", "webp", "avif"}
 
 	for _, format := range formats {
 		t.Run(format, func(t *testing.T) {
@@ -443,7 +448,7 @@ func TestExportEndpoint_FormatSpecificErrors(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mock := &MockOpenSCADExporter{
 				ExportFunc: func(req *models.ExportRequest) ([]byte, string, error) {
-					return nil, "", fmt.Errorf(tt.errMsg)
+					return nil, "", errors.New(tt.errMsg)
 				},
 			}
 			router := setupRouterWithMock(mock)

@@ -11,7 +11,7 @@ Hopefully others will find this useful as well.
 
 ## Features
 
-- **Export to Multiple Formats**: PNG, STL (binary + ASCII), SVG, PDF, and 3MF
+- **Export to Multiple Formats**: PNG, STL (binary + ASCII), SVG, PDF, 3MF, WebP, and AVIF
 - **Summary Generation**: Get diagnostics about SCAD models
 - **Format-Specific Options**: Supports a subset of format-specific parameters from the OpenSCAD CLI
 - **OpenAPI Documentation**: Interactive API docs
@@ -33,7 +33,7 @@ http://localhost:8000/openscad/v1
 POST /openscad/v1/export
 ```
 
-Exports OpenSCAD content to PNG, STL (binary/ASCII), SVG, PDF, or 3MF format.
+Exports OpenSCAD content to PNG, STL (binary/ASCII), SVG, PDF, 3MF, WebP, or AVIF format.
 
 **Supported Formats:**
 
@@ -43,6 +43,8 @@ Exports OpenSCAD content to PNG, STL (binary/ASCII), SVG, PDF, or 3MF format.
 - `svg` - Vector graphics
 - `pdf` - Document export
 - `3mf` - 3D Manufacturing Format (good option for more modern slicers)
+- `webp` - WebP image (smaller file size than PNG)
+- `avif` - AVIF image (modern format with excellent compression)
 
 #### 2. Generate Summary Information
 
@@ -211,6 +213,42 @@ curl -X POST http://localhost:8000/openscad/v1/export \
   --output square.pdf
 ```
 
+### Export to WebP
+
+```bash
+curl -X POST http://localhost:8000/openscad/v1/export \
+  -H "Content-Type: application/json" \
+  -d '{
+    "scad_content": "cube([10,10,10]);",
+    "format": "webp",
+    "options": {
+      "png": {
+        "width": 800,
+        "height": 600
+      }
+    }
+  }' \
+  --output cube.webp
+```
+
+### Export to AVIF
+
+```bash
+curl -X POST http://localhost:8000/openscad/v1/export \
+  -H "Content-Type: application/json" \
+  -d '{
+    "scad_content": "cube([10,10,10]);",
+    "format": "avif",
+    "options": {
+      "png": {
+        "width": 800,
+        "height": 600
+      }
+    }
+  }' \
+  --output cube.avif
+```
+
 ### Generate Summary
 
 ```bash
@@ -298,7 +336,9 @@ Common commands:
 │   └── handlers_test.go
 ├── services/               # Business logic
 │   ├── openscad.go
-│   └── openscad_test.go
+│   ├── openscad_test.go
+│   ├── convert.go
+│   └── convert_test.go
 ├── docs/                   # Swagger documentation (generated)
 ├── Dockerfile              # Docker configuration
 ├── justfile                # Task runner configuration

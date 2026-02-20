@@ -1,10 +1,11 @@
 # Build stage
-FROM golang:1.23-alpine AS builder
+FROM golang:1.26-trixie AS builder
 
 WORKDIR /app
 
 # Install git for version info
-RUN apk add --no-cache git
+RUN apt-get update && apt-get install -y --no-install-recommends git && \
+    rm -rf /var/lib/apt/lists/*
 
 # Copy go mod files
 COPY go.mod go.sum ./
@@ -33,7 +34,8 @@ RUN set -e && \
 FROM openscad/openscad:trixie
 
 # Install ca-certificates and wget for health checks
-RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates wget && \
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates wget && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

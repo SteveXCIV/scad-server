@@ -31,7 +31,7 @@ func NewHandlerWithService(exporter services.OpenSCADExporter) *Handler {
 
 // Export handles the export endpoint
 // @Summary Export SCAD to various formats
-// @Description Exports OpenSCAD content to PNG, STL (binary/ASCII), SVG, or PDF format
+// @Description Exports OpenSCAD content to PNG, STL (binary/ASCII), SVG, PDF, 3MF, WebP, or AVIF format
 // @Tags export
 // @Accept json
 // @Produce octet-stream

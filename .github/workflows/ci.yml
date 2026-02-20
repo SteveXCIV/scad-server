@@ -18,7 +18,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: "1.23"
+          go-version: "1.26"
 
       - name: Install swag
         run: go install github.com/swaggo/swag/cmd/swag@latest
@@ -27,9 +27,9 @@ jobs:
         run: swag init
 
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v3
+        uses: golangci/golangci-lint-action@v7
         with:
-          version: latest
+          version: v2.10
           args: --timeout=5m
 
   build:
@@ -43,7 +43,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: "1.23"
+          go-version: "1.26"
 
       - name: Install swag
         run: go install github.com/swaggo/swag/cmd/swag@latest
@@ -71,7 +71,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: "1.23"
+          go-version: "1.26"
 
       - name: Cache Go modules
         uses: actions/cache@v3
