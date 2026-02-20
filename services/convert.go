@@ -6,13 +6,8 @@ import (
 	"image/png"
 	"log"
 
-	avif "github.com/Kagami/go-avif"
-	"github.com/kolesa-team/go-webp/encoder"
-	"github.com/kolesa-team/go-webp/webp"
-)
-
-const (
-	defaultWebPQuality float32 = 80
+	"github.com/gen2brain/avif"
+	"github.com/gen2brain/webp"
 )
 
 // convertPNGToWebP takes raw PNG bytes and returns WebP-encoded bytes.
@@ -22,13 +17,8 @@ func convertPNGToWebP(pngData []byte) ([]byte, error) {
 		return nil, fmt.Errorf("failed to decode PNG: %w", err)
 	}
 
-	options, err := encoder.NewLossyEncoderOptions(encoder.PresetDefault, defaultWebPQuality)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create WebP encoder options: %w", err)
-	}
-
 	var buf bytes.Buffer
-	if err := webp.Encode(&buf, img, options); err != nil {
+	if err := webp.Encode(&buf, img, webp.Options{Quality: 80}); err != nil {
 		return nil, fmt.Errorf("failed to encode WebP: %w", err)
 	}
 
@@ -44,7 +34,7 @@ func convertPNGToAVIF(pngData []byte) ([]byte, error) {
 	}
 
 	var buf bytes.Buffer
-	if err := avif.Encode(&buf, img, nil); err != nil {
+	if err := avif.Encode(&buf, img); err != nil {
 		return nil, fmt.Errorf("failed to encode AVIF: %w", err)
 	}
 
